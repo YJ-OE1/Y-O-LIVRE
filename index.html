@@ -8,300 +8,285 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
-  --gold:#c8a84b; --gold-d:rgba(200,168,75,0.35);
-  --paper:#f7f0e0; --paper2:#ede5cc;
-  --ink:#1e1208; --ink2:#4a3520;
+  --gold:#c8a84b;
+  --paper:#f7f0e0;
+  --paper2:#ede5cc;
+  --ink:#1e1208;
+  --ink2:#4a3520;
 }
 html,body{
   width:100%;height:100%;overflow:hidden;
   background:#080402;
   font-family:'IM Fell English',serif;
-  touch-action:pan-y;
 }
+#app{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
+#stage{width:100%;height:100%;max-width:430px;position:relative;overflow:hidden;}
 
-/* ── BOOK CONTAINER ── */
-#app{
-  position:fixed;inset:0;
-  display:flex;align-items:stretch;justify-content:center;
-}
-#book{
-  width:100%;max-width:430px;
-  height:100%;
-  position:relative;
-  perspective:900px;
-}
+/* ═══ CANVAS OVERLAYS ═══ */
+#smokeCanvas{position:absolute;inset:0;z-index:60;pointer-events:none;}
+#soulsCanvas{position:fixed;inset:0;z-index:999;pointer-events:none;}
 
-/* ── COVER ── */
+/* ═══ COVER ═══ */
 #cover{
   position:absolute;inset:0;z-index:50;
-  transform-style:preserve-3d;
-  transform-origin:left center;
-  transition:transform 1.3s cubic-bezier(0.23,1,0.32,1);
-  cursor:pointer;
-}
-#cover.opened{ transform:rotateY(-172deg); pointer-events:none; }
-
-.cv-front,.cv-back{
-  position:absolute;inset:0;
-  backface-visibility:hidden;-webkit-backface-visibility:hidden;
-  overflow:hidden;
-}
-/* LEATHER FRONT */
-.cv-front{
   background:
-    radial-gradient(ellipse at 25% 12%, rgba(255,190,80,0.06) 0%, transparent 45%),
-    linear-gradient(162deg, #2a1508 0%, #180c05 20%, #231106 42%, #1c0e06 58%, #271409 74%, #140904 88%, #180c05 100%);
-}
-/* grain texture */
-.cv-front::before{
-  content:'';position:absolute;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
-  background-size:200px 200px;opacity:0.5;mix-blend-mode:multiply;
-}
-/* wear lines */
-.cv-front::after{
-  content:'';position:absolute;inset:0;
-  background-image:
-    repeating-linear-gradient(0deg,transparent,transparent 9px,rgba(0,0,0,0.022) 9px,rgba(0,0,0,0.022) 10px),
-    repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(255,160,60,0.012) 28px,rgba(255,160,60,0.012) 29px);
-}
-/* spine shadow */
-.cv-spine-sh{
-  position:absolute;left:0;top:0;bottom:0;width:24px;
-  background:linear-gradient(90deg,rgba(0,0,0,0.55),transparent);
-  pointer-events:none;
-}
-/* gold frame */
-.cv-frame{position:absolute;inset:11px;border:1px solid rgba(200,168,75,0.25);border-radius:1px;pointer-events:none;}
-.cv-frame::before{content:'';position:absolute;inset:5px;border:1px solid rgba(200,168,75,0.1);}
-
-/* ── COVER CONTENT ── */
-.cv-body{
-  position:absolute;inset:0;
+    radial-gradient(ellipse at 28% 14%, rgba(255,190,80,0.06) 0%, transparent 42%),
+    linear-gradient(164deg, #2a1508 0%, #180c05 18%, #231206 40%, #1c0e06 55%, #271409 72%, #140904 86%, #180c05 100%);
+  cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:24px 28px 80px;
-  gap:0;z-index:2;text-align:center;
 }
-.cv-label{
-  font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:6px;
-  text-transform:uppercase;color:rgba(200,168,75,0.4);margin-bottom:14px;
+/* Dusty film over cover — makes it look aged/forgotten */
+#cover::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:4;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(180,155,100,0.04) 0%, rgba(100,80,40,0.12) 100%),
+    repeating-linear-gradient(0deg,transparent,transparent 9px,rgba(0,0,0,0.018) 9px,rgba(0,0,0,0.018) 10px);
 }
-.cv-medallion{margin-bottom:12px;}
-.cv-names{
-  font-family:'Great Vibes',cursive;
-  font-size:clamp(3rem,13vw,4.2rem);
-  color:var(--gold);line-height:1.1;
-  text-shadow:0 1px 0 rgba(255,220,100,0.25),0 -1px 0 rgba(0,0,0,0.5),0 0 40px rgba(200,168,75,0.2);
-}
-.cv-amp{display:block;font-size:0.52em;color:rgba(200,168,75,0.45);margin:0;}
-.cv-div{width:40px;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.5),transparent);margin:14px auto 10px;}
-.cv-date{font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:5px;color:rgba(200,168,75,0.38);text-transform:uppercase;}
-
-/* corners */
-.cv-corner{position:absolute;width:26px;height:26px;pointer-events:none;}
-.cv-corner svg{width:100%;height:100%;}
-.cv-corner.tl{top:15px;left:15px;}
-.cv-corner.tr{top:15px;right:15px;transform:scaleX(-1);}
-.cv-corner.bl{bottom:15px;left:15px;transform:scaleY(-1);}
-.cv-corner.br{bottom:15px;right:15px;transform:scale(-1);}
-
-/* wax seal */
-.cv-seal{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);}
-/* hint */
-.cv-hint{
-  position:absolute;bottom:7px;width:100%;text-align:center;
-  font-family:'Cinzel',serif;font-size:0.48rem;letter-spacing:4px;
-  text-transform:uppercase;color:rgba(200,168,75,0.28);
-  animation:blink 2.8s ease-in-out infinite;
-}
-@keyframes blink{0%,100%{opacity:0.25}50%{opacity:0.85}}
-
-/* BACK of cover */
-.cv-back{
-  transform:rotateY(180deg);
-  background:linear-gradient(135deg,#1c0907,#2a1110,#190806);
+#cover::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.2'/%3E%3C/svg%3E");
+  background-size:180px;opacity:0.5;mix-blend-mode:multiply;
 }
 
-/* ── PAGES ── */
+.cv-frame{position:absolute;inset:10px;border:1px solid rgba(200,168,75,0.22);pointer-events:none;}
+.cv-frame::before{content:'';position:absolute;inset:5px;border:1px solid rgba(200,168,75,0.09);}
+.cv-spine{position:absolute;left:0;top:0;bottom:0;width:22px;background:linear-gradient(90deg,rgba(0,0,0,0.5),transparent);pointer-events:none;}
+.cv-c{position:absolute;width:24px;height:24px;pointer-events:none;}
+.cv-c svg{width:100%;height:100%;}
+.cv-c.tl{top:14px;left:14px;}.cv-c.tr{top:14px;right:14px;transform:scaleX(-1);}
+.cv-c.bl{bottom:14px;left:14px;transform:scaleY(-1);}.cv-c.br{bottom:14px;right:14px;transform:scale(-1);}
+.cv-body{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:20px;text-align:center;width:100%;}
+.cv-label{font-family:'Cinzel',serif;font-size:clamp(0.45rem,2vw,0.58rem);letter-spacing:6px;text-transform:uppercase;color:rgba(200,168,75,0.15);margin-bottom:14px;}
+.cv-names{font-family:'Great Vibes',cursive;font-size:clamp(3.2rem,14vw,5rem);color:var(--gold);line-height:1.1;text-shadow:0 1px 0 rgba(255,220,100,0.2),0 -1px 0 rgba(0,0,0,0.4),0 0 40px rgba(200,168,75,0.18);opacity:0.45;filter:blur(0.3px);}
+.cv-amp{display:block;font-size:0.5em;color:rgba(200,168,75,0.42);margin:2px 0;}
+.cv-div{width:40px;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.5),transparent);margin:14px auto 12px;}
+.cv-date{font-family:'Cinzel',serif;font-size:clamp(0.5rem,2.2vw,0.65rem);letter-spacing:5px;color:rgba(200,168,75,0.18);text-transform:uppercase;}
+.cv-seal{margin-top:18px;}
+
+/* ── HINT TEXT ── */
+#hint-box{
+  position:absolute;bottom:28px;width:100%;text-align:center;pointer-events:none;z-index:3;
+}
+#hint-text{
+  font-family:'Cinzel',serif;
+  font-size:clamp(0.55rem,2.5vw,0.72rem);
+  letter-spacing:4px;text-transform:uppercase;
+  color:rgba(200,168,75,0.55);
+  display:inline-block;
+  animation:breathe 2.4s ease-in-out infinite;
+}
+@keyframes breathe{0%,100%{opacity:0.25;transform:scale(1)}50%{opacity:0.9;transform:scale(1.04)}}
+/* breath icon pulse */
+#hint-icon{
+  display:block;margin:0 auto 6px;
+  font-size:1.4rem;
+  animation:breathe2 2.4s ease-in-out infinite;
+}
+@keyframes breathe2{0%,100%{opacity:0.3;transform:scale(0.9)}50%{opacity:0.8;transform:scale(1.1)}}
+
+
+/* ── DUST OVERLAY ── */
+#dustCanvas{
+  position:absolute;inset:0;z-index:55;pointer-events:none;
+}
+/* ═══ BOOK OPEN — REALISTIC PAGE FLIP ═══ */
+#bookContainer{
+  position:absolute;inset:0;
+  display:none;
+  perspective:2000px;
+  perspective-origin:50% 50%;
+}
+
 .page{
   position:absolute;inset:0;
-  transform-style:preserve-3d;
-  transform-origin:left center;
-  transition:transform 1s cubic-bezier(0.645,0.045,0.355,1);
-  border-radius:0 4px 4px 0;
-  /* pages start hidden behind cover = no transform needed, just z-index stacking */
+  display:none;
+  pointer-events:none;
 }
-.page.flipped{
-  transform:rotateY(-172deg);
-}
+.page.visible{ display:block; pointer-events:auto; }
+
 .pf,.pb{
   position:absolute;inset:0;
-  backface-visibility:hidden;-webkit-backface-visibility:hidden;
-  overflow:hidden;border-radius:0 4px 4px 0;
+  overflow:hidden;
 }
-.pf{background:var(--paper);}
-.pb{background:var(--paper2);transform:rotateY(180deg);}
+.pf{ background:var(--paper); }
+.pb{ background:var(--paper2); }
 
-/* paper texture */
+/* Paper grain + ruled lines */
 .pf::after,.pb::after{
   content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
   background:
-    linear-gradient(to right,rgba(0,0,0,0.06) 0%,transparent 5%,transparent 95%,rgba(0,0,0,0.04) 100%),
-    repeating-linear-gradient(0deg,transparent,transparent 26px,rgba(160,140,100,0.1) 26px,rgba(160,140,100,0.1) 27px);
+    linear-gradient(to right, rgba(0,0,0,0.055) 0%, transparent 5%, transparent 95%, rgba(0,0,0,0.03) 100%),
+    linear-gradient(to bottom, rgba(0,0,0,0.025) 0%, transparent 3%),
+    repeating-linear-gradient(0deg,transparent,transparent 26px,rgba(160,140,100,0.09) 26px,rgba(160,140,100,0.09) 27px);
 }
 
-/* ── PAGE INNER CONTENT ── */
+
+/* ── PAGE CONTENT ── */
 .pc{
-  /* fills full pf/pb but leaves room for nav at bottom */
   position:absolute;top:0;left:0;right:0;bottom:52px;
-  display:flex;flex-direction:column;align-items:center;
-  justify-content:center;
-  padding:20px 24px 8px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:16px 22px 6px;
   color:var(--ink);z-index:2;overflow:hidden;
-  gap:0;
 }
-/* title block */
-.pc-chapter{font-family:'Cinzel',serif;font-size:0.48rem;letter-spacing:5px;text-transform:uppercase;color:var(--gold);opacity:0.7;margin-bottom:4px;}
-.pc-title{font-family:'Great Vibes',cursive;font-size:clamp(2rem,9vw,3rem);color:var(--ink);line-height:1.15;margin-bottom:2px;}
-.pc-rule{display:flex;align-items:center;gap:6px;width:80%;margin:8px auto;}
-.pc-rule-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-d),transparent);}
-.pc-rule-dia{color:var(--gold);font-size:7px;opacity:0.55;}
-.pc-body{font-family:'IM Fell English',serif;font-style:italic;font-size:clamp(0.85rem,4vw,1rem);color:var(--ink2);line-height:1.75;text-align:center;margin-top:6px;}
-.pc-body.sm{font-size:clamp(0.75rem,3.5vw,0.9rem);}
+.pc-chapter{font-family:'Cinzel',serif;font-size:clamp(0.42rem,1.8vw,0.54rem);letter-spacing:5px;text-transform:uppercase;color:var(--gold);opacity:0.65;margin-bottom:3px;}
+.pc-title{font-family:'Great Vibes',cursive;font-size:clamp(2rem,9vw,2.8rem);color:var(--ink);line-height:1.15;margin-bottom:2px;text-align:center;}
+.pc-rule{display:flex;align-items:center;gap:6px;width:75%;margin:7px auto;}
+.pc-rl{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.32),transparent);}
+.pc-rd{color:var(--gold);font-size:6px;opacity:0.5;}
+.pc-body{font-family:'IM Fell English',serif;font-style:italic;font-size:clamp(0.88rem,3.8vw,1.05rem);color:var(--ink2);line-height:1.75;text-align:center;margin-top:6px;}
+.pc-body.sm{font-size:clamp(0.78rem,3.3vw,0.92rem);}
 .pc-body.plain{font-style:normal;}
+.pc-folio{font-family:'Cinzel',serif;font-size:0.46rem;letter-spacing:3px;color:var(--ink2);opacity:0.28;margin-top:6px;}
 
-/* folio */
-.pc-folio{position:absolute;bottom:58px;font-family:'Cinzel',serif;font-size:0.48rem;letter-spacing:3px;color:var(--ink2);opacity:0.3;}
-.pc-folio.l{left:24px;} .pc-folio.r{right:24px;}
-
-/* ── BOTTOM NAV ── */
+/* ── NAV BAR ── */
 .pg-nav{
   position:absolute;bottom:0;left:0;right:0;height:52px;
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;
-  background:linear-gradient(to top,rgba(247,240,224,1) 55%,rgba(247,240,224,0) 100%);
+  padding:0 14px;
+  background:linear-gradient(to top, rgba(247,240,224,1) 60%, rgba(247,240,224,0) 100%);
   z-index:10;
+  border-top:1px solid rgba(200,168,75,0.07);
 }
-.pb .pg-nav{background:linear-gradient(to top,rgba(237,229,204,1) 55%,rgba(237,229,204,0) 100%);}
-.nav-arr{
-  background:none;border:none;
-  font-size:1.3rem;color:var(--gold);
-  cursor:pointer;padding:8px 10px;
-  opacity:0.65;transition:opacity 0.2s,transform 0.15s;
-  line-height:1;
+.pb .pg-nav,
+.paper2-nav{
+  background:linear-gradient(to top, rgba(237,229,204,1) 60%, rgba(237,229,204,0) 100%);
 }
-.nav-arr:active{opacity:1;transform:scale(1.2);}
-.nav-arr:disabled{opacity:0.15;cursor:default;}
+.nav-btn{
+  background:rgba(200,168,75,0.07);
+  border:1px solid rgba(200,168,75,0.22);
+  border-radius:50%;width:40px;height:40px;
+  font-size:1.15rem;color:var(--gold);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  user-select:none;
+  transition:background 0.15s,transform 0.1s;
+}
+.nav-btn:active{background:rgba(200,168,75,0.2);transform:scale(0.92);}
+.nav-btn:disabled{opacity:0.14;cursor:default;background:transparent;border-color:transparent;}
 .nav-dots{display:flex;gap:6px;align-items:center;}
-.dot{width:5px;height:5px;border-radius:50%;background:rgba(200,168,75,0.2);border:1px solid rgba(200,168,75,0.4);transition:all 0.3s;}
-.dot.on{background:var(--gold);transform:scale(1.25);}
+.dot{width:5px;height:5px;border-radius:50%;background:rgba(200,168,75,0.18);border:1px solid rgba(200,168,75,0.35);transition:all 0.25s;}
+.dot.on{background:var(--gold);transform:scale(1.3);}
 
-/* ── SPECIAL PAGE ELEMENTS ── */
-.cdown{display:flex;gap:8px;justify-content:center;margin:10px 0 6px;}
+/* ── SPECIAL ── */
+.cdown{display:flex;gap:10px;justify-content:center;margin:10px 0 6px;}
 .cu{text-align:center;}
-.cn{font-family:'Cinzel',serif;font-size:clamp(1.5rem,7vw,2.2rem);font-weight:600;color:var(--ink);line-height:1;display:block;}
+.cn{font-family:'Cinzel',serif;font-size:clamp(1.6rem,7vw,2.2rem);font-weight:600;color:var(--ink);line-height:1;display:block;}
 .cl{font-family:'Montserrat',sans-serif;font-size:0.42rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);opacity:0.55;}
-.csep{font-size:1.1rem;color:var(--gold);align-self:center;margin-bottom:4px;opacity:0.45;}
-
+.csep{font-size:1.1rem;color:var(--gold);align-self:center;margin-bottom:4px;opacity:0.4;}
 .ring-w{margin:6px 0;filter:drop-shadow(0 3px 10px rgba(200,168,75,0.3));animation:rfloat 3.5s ease-in-out infinite;}
 @keyframes rfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@keyframes hb{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
-
-.vphoto{width:100%;height:28vw;max-height:145px;object-fit:cover;border-radius:1px;box-shadow:0 2px 10px rgba(0,0,0,0.12);margin:6px 0;}
-.mframe{width:100%;height:28vw;max-height:140px;border:none;border-radius:1px;box-shadow:0 2px 10px rgba(0,0,0,0.1);margin:6px 0;}
-.btn-dir{display:inline-block;padding:6px 18px;border:1px solid var(--gold-d);color:var(--gold);font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:3px;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:all 0.3s;background:transparent;margin-top:4px;}
-.btn-dir:active{background:var(--gold);color:var(--ink);}
-
+.vphoto{width:100%;height:clamp(110px,25vw,145px);object-fit:cover;border-radius:1px;box-shadow:0 2px 10px rgba(0,0,0,0.12);margin:6px 0;}
+.mframe{width:100%;height:clamp(110px,25vw,140px);border:none;border-radius:1px;margin:6px 0;}
+.btn-dir{display:inline-block;padding:6px 18px;border:1px solid rgba(200,168,75,0.35);color:var(--gold);font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:3px;text-transform:uppercase;text-decoration:none;cursor:pointer;margin-top:6px;background:transparent;}
 .irow{display:flex;align-items:center;gap:7px;font-family:'Montserrat',sans-serif;font-size:clamp(0.58rem,2.5vw,0.68rem);color:var(--ink2);margin:2px 0;}
-.ico{color:var(--gold);font-size:0.8rem;}
-
+.ico{color:var(--gold);font-size:0.82rem;}
 .prog{width:100%;text-align:left;margin-top:8px;}
-.prog-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(200,168,75,0.1);}
-.prog-row:last-child{border-bottom:none;}
-.prog-time{font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:1px;color:var(--gold);min-width:34px;padding-top:2px;}
+.prog-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid rgba(200,168,75,0.09);}
+.prog-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.prog-t{font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:1px;color:var(--gold);min-width:34px;padding-top:3px;}
 .prog-ev{font-family:'IM Fell English',serif;font-size:clamp(0.85rem,3.5vw,1rem);font-style:italic;color:var(--ink);}
-.prog-sub{font-family:'Montserrat',sans-serif;font-size:0.52rem;color:var(--ink2);opacity:0.65;}
-
-/* souls canvas */
-#souls{position:fixed;inset:0;pointer-events:none;z-index:999;}
+.prog-sub{font-family:'Montserrat',sans-serif;font-size:0.5rem;color:var(--ink2);opacity:0.6;}
+@keyframes hb{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 </style>
 </head>
 <body>
-<canvas id="souls"></canvas>
+
+<canvas id="smokeCanvas"></canvas>
+<canvas id="dustCanvas"></canvas>
+<canvas id="soulsCanvas"></canvas>
 
 <div id="app">
-<div id="book">
+<div id="stage">
 
-  <!-- ════ PAGES (lowest z first, so pg5 is bottom) ════ -->
+<!-- COVER -->
+<div id="cover">
+  <div class="cv-spine"></div>
+  <div class="cv-frame"></div>
+  <div class="cv-c tl"><svg viewBox="0 0 26 26"><path d="M2 2L16 2L2 16Z" fill="none" stroke="rgba(200,168,75,0.28)" stroke-width="0.7"/><line x1="2" y1="2" x2="2" y2="18" stroke="rgba(200,168,75,0.2)" stroke-width="0.5"/><line x1="2" y1="2" x2="18" y2="2" stroke="rgba(200,168,75,0.2)" stroke-width="0.5"/></svg></div>
+  <div class="cv-c tr"><svg viewBox="0 0 26 26"><path d="M2 2L16 2L2 16Z" fill="none" stroke="rgba(200,168,75,0.28)" stroke-width="0.7"/><line x1="2" y1="2" x2="2" y2="18" stroke="rgba(200,168,75,0.2)" stroke-width="0.5"/><line x1="2" y1="2" x2="18" y2="2" stroke="rgba(200,168,75,0.2)" stroke-width="0.5"/></svg></div>
+  <div class="cv-c bl"><svg viewBox="0 0 26 26"><path d="M2 2L16 2L2 16Z" fill="none" stroke="rgba(200,168,75,0.28)" stroke-width="0.7"/><line x1="2" y1="2" x2="2" y2="18" stroke="rgba(200,168,75,0.2)" stroke-width="0.5"/><line x1="2" y1="2" x2="18" y2="2" stroke="rgba(200,168,75,0.2)" stroke-width="0.5"/></svg></div>
+  <div class="cv-c br"><svg viewBox="0 0 26 26"><path d="M2 2L16 2L2 16Z" fill="none" stroke="rgba(200,168,75,0.28)" stroke-width="0.7"/><line x1="2" y1="2" x2="2" y2="18" stroke="rgba(200,168,75,0.2)" stroke-width="0.5"/><line x1="2" y1="2" x2="18" y2="2" stroke="rgba(200,168,75,0.2)" stroke-width="0.5"/></svg></div>
+  <div class="cv-body">
+    <div class="cv-label">Invitation au mariage</div>
+    <svg width="50" height="50" viewBox="0 0 80 80" style="margin-bottom:10px;">
+      <circle cx="40" cy="40" r="35" stroke="rgba(200,168,75,0.18)" stroke-width="0.6" fill="none"/>
+      <path d="M40 5C44 18 57 22 40 40C23 22 36 18 40 5Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.26)" stroke-width="0.6"/>
+      <path d="M75 40C62 44 58 57 40 40C58 23 62 36 75 40Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.26)" stroke-width="0.6"/>
+      <path d="M40 75C36 62 23 58 40 40C57 58 44 62 40 75Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.26)" stroke-width="0.6"/>
+      <path d="M5 40C18 36 22 23 40 40C22 57 18 44 5 40Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.26)" stroke-width="0.6"/>
+      <circle cx="40" cy="40" r="4.5" fill="rgba(200,168,75,0.32)"/>
+    </svg>
+    <div class="cv-names">Youssef<span class="cv-amp">&amp;</span>Oumaima</div>
+    <div class="cv-div"></div>
+    <div class="cv-date">4 · Avril · 2026</div>
+    <div class="cv-seal" style="opacity:0.35;">
+      <svg width="50" height="50" viewBox="0 0 50 50">
+        <circle cx="25" cy="25" r="22" fill="#6b1a1a" opacity="0.8"/>
+        <circle cx="25" cy="25" r="19" fill="#7d2020" opacity="0.6"/>
+        <circle cx="25" cy="25" r="17" fill="none" stroke="rgba(200,168,75,0.25)" stroke-width="0.7"/>
+        <text x="25" y="21" text-anchor="middle" font-family="'Great Vibes',cursive" font-size="9" fill="rgba(200,168,75,0.78)">Y&amp;M</text>
+        <text x="25" y="31" text-anchor="middle" font-family="'Cinzel',serif" font-size="4" fill="rgba(200,168,75,0.42)" letter-spacing="1">2026</text>
+      </svg>
+    </div>
+  </div>
+  <div id="hint-box">
+    <span id="hint-icon">🖐</span>
+    <span id="hint-text">Toucher pour ouvrir</span>
+  </div>
+</div>
 
-  <!-- PAGE 5 — last -->
-  <div class="page" id="pg5" style="z-index:4;">
+<!-- PAGES -->
+<div id="bookContainer">
+
+  <!-- Page 1 -->
+  <div class="page visible" id="pg0">
     <div class="pf">
       <div class="pc" style="justify-content:center;">
-        <div class="pc-chapter">Épilogue</div>
-        <div class="pc-title">Avec Amour</div>
-        <div class="pc-rule"><div class="pc-rule-line"></div><div class="pc-rule-dia">◆</div><div class="pc-rule-line"></div></div>
-        <p class="pc-body">Votre présence est le plus<br>beau des cadeaux que vous<br>puissiez nous offrir.</p>
-        <div style="margin:16px 0;font-family:'Great Vibes',cursive;font-size:clamp(1.6rem,7vw,2.2rem);color:var(--ink2);text-align:center;">Youssef &amp; Oumaima</div>
-        <div class="pc-rule"><div class="pc-rule-line"></div><div class="pc-rule-dia">◆</div><div class="pc-rule-line"></div></div>
-        <p class="pc-body sm" style="margin-top:10px;opacity:0.6;">Nous vous attendons avec impatience<br>le 4 Avril 2026.</p>
+        <div class="pc-chapter">Chapitre I</div>
+        <svg width="40" height="40" viewBox="0 0 60 60" style="margin:4px 0 8px;"><circle cx="30" cy="30" r="26" stroke="rgba(200,168,75,0.2)" stroke-width="0.6" fill="none"/><path d="M30 4C33 14 42 18 30 30C18 18 27 14 30 4Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/><path d="M56 30C46 33 42 42 30 30C42 18 46 27 56 30Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/><path d="M30 56C27 46 18 42 30 30C42 42 33 46 30 56Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/><path d="M4 30C14 27 18 18 30 30C18 42 14 33 4 30Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/><circle cx="30" cy="30" r="3" fill="rgba(200,168,75,0.35)"/></svg>
+        <div class="pc-title" style="font-size:clamp(2.2rem,10vw,3rem);">Youssef<br><span style="font-size:0.55em;color:var(--ink2);">&amp;</span><br>Oumaima</div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+        <p class="pc-body plain sm" style="font-family:'Cinzel',serif;font-size:clamp(0.48rem,2vw,0.6rem);letter-spacing:4px;opacity:0.5;margin-top:2px;">INVITATION AU MARIAGE</p>
+        <p class="pc-body sm" style="margin-top:10px;opacity:0.62;">Nous avons l'honneur de vous convier<br>à célébrer avec nous le plus beau<br>jour de notre vie.</p>
+        <div class="pc-folio" style="margin-top:10px;">I</div>
       </div>
-      <span class="pc-folio r">VII</span>
       <div class="pg-nav">
-        <button class="nav-arr" onclick="prevPage(event)">&#8592;</button>
-        <div class="nav-dots" id="nd5"></div>
-        <button class="nav-arr" disabled>&#8594;</button>
+        <button class="nav-btn" id="btn0l">&#8592;</button>
+        <div class="nav-dots" id="d0"></div>
+        <button class="nav-btn" id="btn0r">&#8594;</button>
       </div>
-    </div>
-    <div class="pb">
-      <div class="pc" style="justify-content:center;opacity:0.2;"><div style="font-family:'Great Vibes',cursive;font-size:2.5rem;color:var(--ink);">Fin</div></div>
     </div>
   </div>
 
-  <!-- PAGE 4 -->
-  <div class="page" id="pg4" style="z-index:5;">
+  <!-- Page 2 -->
+  <div class="page" id="pg1">
     <div class="pf">
-      <div class="pc">
-        <div class="pc-chapter">La Soirée</div>
-        <div class="pc-title">Programme</div>
-        <div class="pc-rule"><div class="pc-rule-line"></div><div class="pc-rule-dia">◆</div><div class="pc-rule-line"></div></div>
-        <div class="prog">
-          <div class="prog-row"><span class="prog-time">19h00</span><div><div class="prog-ev">Accueil des invités</div><div class="prog-sub">Cocktail de bienvenue</div></div></div>
-          <div class="prog-row"><span class="prog-time">20h00</span><div><div class="prog-ev">Dîner de Gala</div><div class="prog-sub">Gastronomie &amp; convivialité</div></div></div>
-          <div class="prog-row"><span class="prog-time">22h00</span><div><div class="prog-ev">Soirée &amp; Fête</div><div class="prog-sub">Musique &amp; danse toute la nuit</div></div></div>
-        </div>
+      <div class="pc" style="justify-content:center;">
+        <div class="pc-chapter">Chapitre II</div>
+        <div class="pc-title">Notre Histoire</div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+        <p class="pc-body" style="margin-top:8px;">Deux âmes que le destin a réunies,<br>un regard qui a tout changé.</p>
+        <div style="margin:14px 0;color:var(--gold);font-size:1.4rem;opacity:0.7;animation:hb 2s ease-in-out infinite;">♥</div>
+        <p class="pc-body sm" style="opacity:0.65;">C'est avec joie que nous vous<br>convions à célébrer ce moment<br>unique avec nous.</p>
+        <div class="pc-rule" style="margin-top:14px;"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+        <p class="pc-body plain sm" style="font-family:'Cinzel',serif;font-size:clamp(0.45rem,1.8vw,0.56rem);letter-spacing:3px;opacity:0.42;margin-top:6px;">SAMEDI · 4 AVRIL 2026</p>
+        <div class="pc-folio" style="margin-top:8px;">II</div>
       </div>
-      <span class="pc-folio l">V</span>
       <div class="pg-nav">
-        <button class="nav-arr" onclick="prevPage(event)">&#8592;</button>
-        <div class="nav-dots" id="nd4"></div>
-        <button class="nav-arr" onclick="nextPage(event)">&#8594;</button>
-      </div>
-    </div>
-    <div class="pb">
-      <div class="pc">
-        <div class="pc-chapter">Comment venir</div>
-        <div class="pc-title">La Carte</div>
-        <div class="pc-rule"><div class="pc-rule-line"></div><div class="pc-rule-dia">◆</div><div class="pc-rule-line"></div></div>
-        <iframe class="mframe" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3323.891!2d-7.661389!3d33.588500!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xda7d2fde0b87387%3A0x3dbef5c13491d!2sCasablanca%2C%20Morocco!5e0!3m2!1sfr!2sma!4v1708000000000" allowfullscreen loading="lazy"></iframe>
-        <a href="https://maps.app.goo.gl/V8ewxEcuPoiRUozn9" target="_blank" class="btn-dir">Voir l'itinéraire →</a>
-      </div>
-      <span class="pc-folio r">VI</span>
-      <div class="pg-nav" style="background:linear-gradient(to top,rgba(237,229,204,1) 55%,rgba(237,229,204,0));">
-        <button class="nav-arr" onclick="prevPage(event)">&#8592;</button>
-        <div class="nav-dots" id="nd4b"></div>
-        <button class="nav-arr" onclick="nextPage(event)">&#8594;</button>
+        <button class="nav-btn" id="btn1l">&#8592;</button>
+        <div class="nav-dots" id="d1"></div>
+        <button class="nav-btn" id="btn1r">&#8594;</button>
       </div>
     </div>
   </div>
 
-  <!-- PAGE 3 -->
-  <div class="page" id="pg3" style="z-index:6;">
+  <!-- Page 3 -->
+  <div class="page" id="pg2">
     <div class="pf">
       <div class="pc">
         <div class="pc-chapter">Le Lieu</div>
         <div class="pc-title">Notre Salle</div>
-        <div class="pc-rule"><div class="pc-rule-line"></div><div class="pc-rule-dia">◆</div><div class="pc-rule-line"></div></div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
         <img class="vphoto" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0a
 HBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIy
 MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wgARCASUBJsDASIA
@@ -2717,19 +2702,24 @@ S59ZnpCf/9k=" alt="Salle"/>
         <div class="irow"><span class="ico">📍</span>Casablanca, Maroc</div>
         <div class="irow"><span class="ico">🕖</span>Samedi 4 Avril 2026 · 19h00</div>
         <div class="irow"><span class="ico">✨</span>Soirée de Gala</div>
+        <a href="https://maps.app.goo.gl/V8ewxEcuPoiRUozn9" target="_blank" class="btn-dir" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;">📍 Voir sur Google Maps →</a>
+        <div class="pc-folio" style="margin-top:8px;">III</div>
       </div>
-      <span class="pc-folio l">III</span>
       <div class="pg-nav">
-        <button class="nav-arr" onclick="prevPage(event)">&#8592;</button>
-        <div class="nav-dots" id="nd3"></div>
-        <button class="nav-arr" onclick="nextPage(event)">&#8594;</button>
+        <button class="nav-btn" id="btn2l">&#8592;</button>
+        <div class="nav-dots" id="d2"></div>
+        <button class="nav-btn" id="btn2r">&#8594;</button>
       </div>
     </div>
-    <div class="pb">
+  </div>
+
+  <!-- Page 4 -->
+  <div class="page" id="pg3">
+    <div class="pf" style="background:var(--paper2);">
       <div class="pc" style="justify-content:center;">
         <div class="pc-chapter">Plus que...</div>
         <div class="pc-title">Le Grand Jour</div>
-        <div class="pc-rule"><div class="pc-rule-line"></div><div class="pc-rule-dia">◆</div><div class="pc-rule-line"></div></div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
         <div class="cdown" id="countdown">
           <div class="cu"><span class="cn" id="cdj">--</span><span class="cl">Jours</span></div>
           <div class="csep">·</div>
@@ -2740,285 +2730,665 @@ S59ZnpCf/9k=" alt="Salle"/>
           <div class="cu"><span class="cn" id="cds">--</span><span class="cl">Sec</span></div>
         </div>
         <div class="ring-w">
-          <svg width="72" height="72" viewBox="0 0 160 160">
-            <defs>
-              <linearGradient id="gG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f5d27a"/><stop offset="40%" stop-color="#e8b84b"/><stop offset="60%" stop-color="#c8922a"/><stop offset="100%" stop-color="#f5d27a"/></linearGradient>
-              <linearGradient id="dG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8f4ff"/><stop offset="50%" stop-color="#8fc8f0"/><stop offset="100%" stop-color="#deeeff"/></linearGradient>
-            </defs>
-            <ellipse cx="80" cy="112" rx="38" ry="10" fill="none" stroke="url(#gG)" stroke-width="7"/>
-            <line x1="42" y1="112" x2="42" y2="72" stroke="url(#gG)" stroke-width="7"/>
-            <line x1="118" y1="112" x2="118" y2="72" stroke="url(#gG)" stroke-width="7"/>
-            <ellipse cx="80" cy="72" rx="38" ry="10" fill="url(#gG)"/>
-            <polygon points="80,30 92,52 80,48 68,52" fill="url(#dG)" stroke="#8fb8d8" stroke-width="1"/>
-            <polygon points="80,30 92,52 80,44" fill="rgba(255,255,255,0.65)"/>
-            <polygon points="80,48 92,52 80,58 68,52" fill="url(#dG)" stroke="#8fb8d8" stroke-width="1"/>
-          </svg>
+          <svg width="70" height="70" viewBox="0 0 160 160"><defs><linearGradient id="gG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f5d27a"/><stop offset="40%" stop-color="#e8b84b"/><stop offset="60%" stop-color="#c8922a"/><stop offset="100%" stop-color="#f5d27a"/></linearGradient><linearGradient id="dG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8f4ff"/><stop offset="50%" stop-color="#8fc8f0"/><stop offset="100%" stop-color="#deeeff"/></linearGradient></defs><ellipse cx="80" cy="112" rx="38" ry="10" fill="none" stroke="url(#gG)" stroke-width="7"/><line x1="42" y1="112" x2="42" y2="72" stroke="url(#gG)" stroke-width="7"/><line x1="118" y1="112" x2="118" y2="72" stroke="url(#gG)" stroke-width="7"/><ellipse cx="80" cy="72" rx="38" ry="10" fill="url(#gG)"/><polygon points="80,30 92,52 80,48 68,52" fill="url(#dG)" stroke="#8fb8d8" stroke-width="1"/><polygon points="80,30 92,52 80,44" fill="rgba(255,255,255,0.65)"/><polygon points="80,48 92,52 80,58 68,52" fill="url(#dG)" stroke="#8fb8d8" stroke-width="1"/></svg>
         </div>
-        <p class="pc-body sm" style="opacity:0.55;">Casablanca · Maroc</p>
+        <p class="pc-body sm" style="opacity:0.5;">Casablanca · Maroc</p>
+        <div class="pc-folio" style="margin-top:6px;">IV</div>
       </div>
-      <span class="pc-folio r">IV</span>
-      <div class="pg-nav" style="background:linear-gradient(to top,rgba(237,229,204,1) 55%,rgba(237,229,204,0));">
-        <button class="nav-arr" onclick="prevPage(event)">&#8592;</button>
-        <div class="nav-dots" id="nd3b"></div>
-        <button class="nav-arr" onclick="nextPage(event)">&#8594;</button>
+      <div class="pg-nav" style="background:linear-gradient(to top,rgba(237,229,204,1) 60%,rgba(237,229,204,0) 100%);">
+        <button class="nav-btn" id="btn3l">&#8592;</button>
+        <div class="nav-dots" id="d3"></div>
+        <button class="nav-btn" id="btn3r">&#8594;</button>
       </div>
     </div>
   </div>
 
-  <!-- PAGE 2 -->
-  <div class="page" id="pg2" style="z-index:7;">
+  <!-- Page 5 (was pg5, now pg4) -->
+  <div class="page" id="pg4">
     <div class="pf">
       <div class="pc" style="justify-content:center;">
-        <div class="pc-chapter">Chapitre II</div>
-        <div class="pc-title">Notre Histoire</div>
-        <div class="pc-rule"><div class="pc-rule-line"></div><div class="pc-rule-dia">◆</div><div class="pc-rule-line"></div></div>
-        <p class="pc-body" style="margin-top:8px;">Deux âmes que le destin<br>a réunies, un regard<br>qui a tout changé.</p>
-        <div style="margin:14px 0;color:var(--gold);font-size:1.4rem;opacity:0.7;animation:hb 2s ease-in-out infinite;">♥</div>
-        <p class="pc-body sm" style="opacity:0.65;">C'est avec joie que nous vous<br>convions à célébrer avec nous<br>ce moment unique.</p>
-        <div class="pc-rule" style="margin-top:14px;"><div class="pc-rule-line"></div><div class="pc-rule-dia">◆</div><div class="pc-rule-line"></div></div>
-        <p class="pc-body plain sm" style="font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:3px;opacity:0.45;margin-top:8px;">SAMEDI · 4 AVRIL 2026</p>
+        <div class="pc-chapter">Épilogue</div>
+        <div class="pc-title">Avec Amour</div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+        <p class="pc-body" style="margin-top:8px;">Votre présence est le plus beau<br>des cadeaux que vous puissiez<br>nous offrir.</p>
+        <div style="margin:16px 0;font-family:'Great Vibes',cursive;font-size:clamp(1.6rem,7vw,2.2rem);color:var(--ink2);text-align:center;">Youssef &amp; Oumaima</div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+        <p class="pc-body sm" style="margin-top:10px;opacity:0.58;">Nous vous attendons avec impatience<br>le 4 Avril 2026.</p>
+        <div class="pc-folio" style="margin-top:10px;">V</div>
       </div>
-      <span class="pc-folio l">II</span>
       <div class="pg-nav">
-        <button class="nav-arr" onclick="prevPage(event)">&#8592;</button>
-        <div class="nav-dots" id="nd2"></div>
-        <button class="nav-arr" onclick="nextPage(event)">&#8594;</button>
+        <button class="nav-btn" id="btn4l">&#8592;</button>
+        <div class="nav-dots" id="d4"></div>
+        <button class="nav-btn" disabled>&#8594;</button>
       </div>
     </div>
-    <div class="pb"><div class="pc" style="justify-content:center;opacity:0.1;"><span style="font-size:2rem;color:var(--ink);">◆</span></div></div>
   </div>
 
-  <!-- PAGE 1 — top of stack, first seen after cover opens -->
-  <div class="page" id="pg1" style="z-index:8;">
+  <!-- (old pg6 removed, epilogue moved to pg4) -->
+  <div class="page" id="pg5" style="display:none!important">
     <div class="pf">
       <div class="pc" style="justify-content:center;">
-        <div class="pc-chapter">Chapitre I</div>
-        <svg width="44" height="44" viewBox="0 0 60 60" style="margin:4px 0 6px;">
-          <circle cx="30" cy="30" r="26" stroke="rgba(200,168,75,0.22)" stroke-width="0.6" fill="none"/>
-          <path d="M30 4C33 14 42 18 30 30C18 18 27 14 30 4Z" fill="rgba(200,168,75,0.1)" stroke="rgba(200,168,75,0.28)" stroke-width="0.5"/>
-          <path d="M56 30C46 33 42 42 30 30C42 18 46 27 56 30Z" fill="rgba(200,168,75,0.1)" stroke="rgba(200,168,75,0.28)" stroke-width="0.5"/>
-          <path d="M30 56C27 46 18 42 30 30C42 42 33 46 30 56Z" fill="rgba(200,168,75,0.1)" stroke="rgba(200,168,75,0.28)" stroke-width="0.5"/>
-          <path d="M4 30C14 27 18 18 30 30C18 42 14 33 4 30Z" fill="rgba(200,168,75,0.1)" stroke="rgba(200,168,75,0.28)" stroke-width="0.5"/>
-          <circle cx="30" cy="30" r="3.5" fill="rgba(200,168,75,0.38)"/>
-        </svg>
-        <div class="pc-title" style="font-size:clamp(2.2rem,10vw,3.2rem);">Youssef<br><span style="font-size:0.55em;color:var(--ink2);">&amp;</span><br>Oumaima</div>
-        <div class="pc-rule"><div class="pc-rule-line"></div><div class="pc-rule-dia">◆</div><div class="pc-rule-line"></div></div>
-        <p class="pc-body plain sm" style="font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:4px;opacity:0.55;margin-top:4px;">INVITATION AU MARIAGE</p>
-        <p class="pc-body sm" style="margin-top:10px;opacity:0.6;">Nous avons l'honneur de vous<br>convier à célébrer avec nous<br>le plus beau jour de notre vie.</p>
+        <div class="pc-chapter">Épilogue</div>
+        <div class="pc-title">Avec Amour</div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+        <p class="pc-body" style="margin-top:8px;">Votre présence est le plus beau<br>des cadeaux que vous puissiez<br>nous offrir.</p>
+        <div style="margin:16px 0;font-family:'Great Vibes',cursive;font-size:clamp(1.6rem,7vw,2.2rem);color:var(--ink2);text-align:center;">Youssef &amp; Oumaima</div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+        <p class="pc-body sm" style="margin-top:10px;opacity:0.58;">Nous vous attendons avec impatience<br>le 4 Avril 2026.</p>
+        <div class="pc-folio" style="margin-top:10px;">VII</div>
       </div>
-      <span class="pc-folio r">I</span>
       <div class="pg-nav">
-        <button class="nav-arr" disabled>&#8592;</button>
-        <div class="nav-dots" id="nd1"></div>
-        <button class="nav-arr" onclick="nextPage(event)">&#8594;</button>
+        <button class="nav-btn" id="btn6l">&#8592;</button>
+        <div class="nav-dots" id="d6"></div>
+        <button class="nav-btn" disabled>&#8594;</button>
       </div>
     </div>
-    <div class="pb"><div class="pc" style="justify-content:center;opacity:0.1;"><span style="font-size:2rem;color:var(--ink);">◆</span></div></div>
   </div>
 
-  <!-- ════ COVER (always on top until opened) ════ -->
-  <div id="cover">
-    <div class="cv-front">
-      <div class="cv-spine-sh"></div>
-      <div class="cv-frame"></div>
-      <!-- corners -->
-      <div class="cv-corner tl"><svg viewBox="0 0 28 28"><path d="M2 2L18 2L2 18Z" fill="none" stroke="rgba(200,168,75,0.3)" stroke-width="0.8"/><line x1="2" y1="2" x2="2" y2="20" stroke="rgba(200,168,75,0.22)" stroke-width="0.6"/><line x1="2" y1="2" x2="20" y2="2" stroke="rgba(200,168,75,0.22)" stroke-width="0.6"/></svg></div>
-      <div class="cv-corner tr"><svg viewBox="0 0 28 28"><path d="M2 2L18 2L2 18Z" fill="none" stroke="rgba(200,168,75,0.3)" stroke-width="0.8"/><line x1="2" y1="2" x2="2" y2="20" stroke="rgba(200,168,75,0.22)" stroke-width="0.6"/><line x1="2" y1="2" x2="20" y2="2" stroke="rgba(200,168,75,0.22)" stroke-width="0.6"/></svg></div>
-      <div class="cv-corner bl"><svg viewBox="0 0 28 28"><path d="M2 2L18 2L2 18Z" fill="none" stroke="rgba(200,168,75,0.3)" stroke-width="0.8"/><line x1="2" y1="2" x2="2" y2="20" stroke="rgba(200,168,75,0.22)" stroke-width="0.6"/><line x1="2" y1="2" x2="20" y2="2" stroke="rgba(200,168,75,0.22)" stroke-width="0.6"/></svg></div>
-      <div class="cv-corner br"><svg viewBox="0 0 28 28"><path d="M2 2L18 2L2 18Z" fill="none" stroke="rgba(200,168,75,0.3)" stroke-width="0.8"/><line x1="2" y1="2" x2="2" y2="20" stroke="rgba(200,168,75,0.22)" stroke-width="0.6"/><line x1="2" y1="2" x2="20" y2="2" stroke="rgba(200,168,75,0.22)" stroke-width="0.6"/></svg></div>
-      <!-- content -->
-      <div class="cv-body">
-        <div class="cv-label">Invitation au mariage</div>
-        <svg class="cv-medallion" width="52" height="52" viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r="36" stroke="rgba(200,168,75,0.18)" stroke-width="0.6" fill="none"/>
-          <path d="M40 4C44 18 58 22 40 40C22 22 36 18 40 4Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.28)" stroke-width="0.6"/>
-          <path d="M76 40C62 44 58 58 40 40C58 22 62 36 76 40Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.28)" stroke-width="0.6"/>
-          <path d="M40 76C36 62 22 58 40 40C58 58 44 62 40 76Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.28)" stroke-width="0.6"/>
-          <path d="M4 40C18 36 22 22 40 40C22 58 18 44 4 40Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.28)" stroke-width="0.6"/>
-          <circle cx="40" cy="40" r="5" fill="rgba(200,168,75,0.32)" stroke="rgba(200,168,75,0.45)" stroke-width="0.5"/>
-          <circle cx="40" cy="40" r="2" fill="rgba(200,168,75,0.65)"/>
-        </svg>
-        <div class="cv-names">Youssef<span class="cv-amp">&amp;</span>Oumaima</div>
-        <div class="cv-div"></div>
-        <div class="cv-date">4 · Avril · 2026</div>
-      </div>
-      <!-- wax seal -->
-      <div class="cv-seal">
-        <svg width="52" height="52" viewBox="0 0 52 52">
-          <circle cx="26" cy="26" r="23" fill="#6b1a1a" opacity="0.82"/>
-          <circle cx="26" cy="26" r="21" fill="#7d2020" opacity="0.65"/>
-          <circle cx="26" cy="26" r="18" fill="none" stroke="rgba(200,168,75,0.28)" stroke-width="0.8"/>
-          <text x="26" y="22" text-anchor="middle" font-family="'Great Vibes',cursive" font-size="9.5" fill="rgba(200,168,75,0.8)">Y&amp;M</text>
-          <text x="26" y="33" text-anchor="middle" font-family="'Cinzel',serif" font-size="4.5" fill="rgba(200,168,75,0.45)" letter-spacing="1">2026</text>
-        </svg>
-      </div>
-      <div class="cv-hint">Toucher pour ouvrir</div>
-    </div>
-    <div class="cv-back"></div>
-  </div>
-
-</div><!-- /book -->
+</div><!-- /bookContainer -->
+</div><!-- /stage -->
 </div><!-- /app -->
 
 <script>
-// heartbeat keyframe
 document.head.insertAdjacentHTML('beforeend','<style>@keyframes hb{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}</style>');
 
-// ── COUNTDOWN ──
+
+// ═══════════════════════════════════════
+//  DUST PARTICLE SYSTEM (on cover)
+// ═══════════════════════════════════════
+const DC = document.getElementById('dustCanvas');
+const DX = DC.getContext('2d');
+let dustParticles = [];
+let dustRAF = null;
+let dustSettled = true; // dust is lying on the book
+let dustCleared = false;
+
+function resizeDustCanvas(){
+  const stage = document.getElementById('stage');
+  DC.width = stage.offsetWidth;
+  DC.height = stage.offsetHeight;
+}
+resizeDustCanvas();
+window.addEventListener('resize', resizeDustCanvas);
+
+// Create settled dust particles (random specs on the cover)
+function initDust(){
+  dustParticles = [];
+  const W = DC.width, H = DC.height;
+  // ~280 dust motes resting on the book
+  for(let i = 0; i < 280; i++){
+    dustParticles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: 0.6 + Math.random() * 2.2,
+      alpha: 0.05 + Math.random() * 0.22,
+      settled: true,
+      vx: 0, vy: 0,
+      life: 1.0,
+      decay: 0,
+      hue: Math.random() < 0.3 ? 40 : 0,
+      sat: Math.random() < 0.3 ? 20 : 0,
+    });
+  }
+}
+
+function drawDust(){
+  DX.clearRect(0, 0, DC.width, DC.height);
+  let anyAlive = false;
+
+  for(let p of dustParticles){
+    if(p.life <= 0) continue;
+    anyAlive = true;
+
+    if(!p.settled){
+      // Flying particle
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vx *= 0.97;
+      p.vy *= 0.97;
+      p.vy -= 0.04; // float upward
+      p.vx += (Math.random() - 0.5) * 0.15; // turbulence
+      p.r += 0.01;
+      p.life -= p.decay;
+    }
+
+    const a = p.life * p.alpha;
+    if(a <= 0) continue;
+
+    const color = p.hue > 0
+      ? `hsla(${p.hue},${p.sat}%,85%,${a})`
+      : `rgba(210,190,155,${a})`;
+
+    DX.beginPath();
+    DX.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    DX.fillStyle = color;
+    DX.fill();
+  }
+
+  if(anyAlive){
+    dustRAF = requestAnimationFrame(drawDust);
+  } else {
+    DX.clearRect(0, 0, DC.width, DC.height);
+    dustParticles = [];
+    dustRAF = null;
+  }
+}
+
+// Blow dust away on click - particles scatter from click point
+function blowDust(cx, cy){
+  if(dustCleared) return;
+  dustCleared = true;
+
+  for(let p of dustParticles){
+    p.settled = false;
+    // Direction away from click point
+    const dx = p.x - cx;
+    const dy = p.y - cy;
+    const dist = Math.sqrt(dx*dx + dy*dy) + 0.1;
+    const force = (150 / (dist + 80)) + 0.5;
+    const ang = Math.atan2(dy, dx) + (Math.random()-0.5)*1.2;
+    p.vx = Math.cos(ang) * force * (0.5 + Math.random());
+    p.vy = Math.sin(ang) * force * (0.3 + Math.random()) - 0.8;
+    p.decay = 0.006 + Math.random() * 0.012;
+    p.alpha = p.alpha * 0.85;
+  }
+
+  if(!dustRAF) dustRAF = requestAnimationFrame(drawDust);
+}
+
+// Draw grain/vignette over dust to make it look thick
+function drawDustVignette(){
+  // Already handled per particle, but add a subtle overall film
+  const W = DC.width, H = DC.height;
+  // Slight yellowish film on top of cover
+  const film = DX.createRadialGradient(W/2,H/2,0, W/2,H/2,Math.max(W,H)*0.7);
+  film.addColorStop(0,'rgba(180,155,90,0.0)');
+  film.addColorStop(1,'rgba(120,100,60,0.08)');
+  DX.fillStyle = film;
+  DX.fillRect(0,0,W,H);
+}
+
+// Initialize dust on load and draw it settled
+initDust();
+// Draw the settled dust once (static render)
+(function renderSettledDust(){
+  DX.clearRect(0,0,DC.width,DC.height);
+  for(let p of dustParticles){
+    const a = p.alpha;
+    const color = p.hue > 0
+      ? `hsla(${p.hue},${p.sat}%,85%,${a})`
+      : `rgba(210,190,155,${a})`;
+    DX.beginPath();
+    DX.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    DX.fillStyle = color;
+    DX.fill();
+  }
+  drawDustVignette();
+})();
+
+// ═══════════════════════════════════════
+//  SMOKE PARTICLE SYSTEM
+// ═══════════════════════════════════════
+const SC = document.getElementById('smokeCanvas');
+const SX = SC.getContext('2d');
+let smokeRAF = null;
+let smokeParticles = [];
+
+function resizeSmoke(){
+  SC.width = window.innerWidth;
+  SC.height = window.innerHeight;
+}
+resizeSmoke();
+window.addEventListener('resize', resizeSmoke);
+
+function spawnSmoke(originX, originY){
+  // Spawn a burst of dust/smoke particles from bottom of screen spreading up
+  const count = 55;
+  for(let i = 0; i < count; i++){
+    const angle = -Math.PI/2 + (Math.random()-0.5) * Math.PI * 1.1; // spread upward
+    const speed = 0.6 + Math.random() * 2.8;
+    smokeParticles.push({
+      x: originX + (Math.random()-0.5)*80,
+      y: originY + (Math.random()-0.5)*30,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 0.5,
+      life: 1.0,
+      decay: 0.005 + Math.random()*0.008,
+      r: 18 + Math.random()*55,
+      // golden dust tint
+      hue: Math.random() < 0.35 ? 38 : 0, // gold or grey
+      sat: Math.random() < 0.35 ? 30 : 0,
+    });
+  }
+}
+
+function drawSmoke(){
+  SX.clearRect(0,0,SC.width,SC.height);
+  let alive = false;
+  for(let p of smokeParticles){
+    if(p.life <= 0) continue;
+    alive = true;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vx *= 0.985;
+    p.vy *= 0.985;
+    p.vy -= 0.012; // drift upward
+    p.r  += 0.55;  // expand
+    p.life -= p.decay;
+    const a = Math.max(0, p.life * 0.22);
+    const color = p.hue > 0
+      ? `hsla(${p.hue}, ${p.sat}%, 75%, ${a})`
+      : `rgba(200,185,160,${a})`;
+    const grad = SX.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);
+    grad.addColorStop(0, color);
+    grad.addColorStop(1, 'transparent');
+    SX.beginPath();
+    SX.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    SX.fillStyle = grad;
+    SX.fill();
+  }
+  if(alive) smokeRAF = requestAnimationFrame(drawSmoke);
+  else {
+    SX.clearRect(0,0,SC.width,SC.height);
+    smokeParticles = [];
+    smokeRAF = null;
+  }
+}
+
+// ═══════════════════════════════════════
+//  COUNTDOWN
+// ═══════════════════════════════════════
 function tick(){
-  const d=new Date('2026-04-04T19:00:00')-new Date();
+  const d = new Date('2026-04-04T19:00:00') - new Date();
   if(d<=0)return;
   document.getElementById('cdj').textContent=String(Math.floor(d/86400000)).padStart(2,'0');
   document.getElementById('cdh').textContent=String(Math.floor(d%86400000/3600000)).padStart(2,'0');
   document.getElementById('cdm').textContent=String(Math.floor(d%3600000/60000)).padStart(2,'0');
   document.getElementById('cds').textContent=String(Math.floor(d%60000/1000)).padStart(2,'0');
 }
-tick();setInterval(tick,1000);
+tick(); setInterval(tick,1000);
 
-// ── SOULS ──
-const SC=document.getElementById('souls');
-const SX=SC.getContext('2d');
-function rsz(){SC.width=window.innerWidth;SC.height=window.innerHeight;}
-rsz();window.addEventListener('resize',rsz);
+// ═══════════════════════════════════════
+//  BOOK OPEN SEQUENCE
+// ═══════════════════════════════════════
+const cover       = document.getElementById('cover');
+const bookCont    = document.getElementById('bookContainer');
+let bookOpen = false;
 
-function runSouls(cx,cy,cb){
-  const TM=50,sA={trail:[],x:0,y:0},sB={trail:[],x:0,y:0};
-  let ang=0,ot=0,mt=0,merged=false;
-  function ds(px,py,tr,g,a){
-    for(let i=0;i<tr.length;i++){
-      const p=i/tr.length;
-      SX.beginPath();SX.arc(tr[i].x,tr[i].y,g*p*.4,0,Math.PI*2);
-      SX.fillStyle=`rgba(255,255,255,${p*p*.55*a})`;SX.fill();
+function openBook(evtX, evtY){
+  if(bookOpen) return;
+  bookOpen = true;
+  cover.style.pointerEvents = 'none';
+
+  // 0. Blow dust away from click point
+  const stageR = document.getElementById('stage').getBoundingClientRect();
+  const localX = (evtX || (stageR.left + stageR.width/2)) - stageR.left;
+  const localY = (evtY || (stageR.top + stageR.height/2)) - stageR.top;
+  blowDust(localX, localY);
+
+  // 1. Smoke burst from center
+  const r = cover.getBoundingClientRect();
+  const cx = r.left + r.width/2;
+  const cy = r.top  + r.height * 0.7;
+  spawnSmoke(cx, cy);
+  drawSmoke();
+
+  // 2. Cover shudders (physical feel)
+  cover.style.transition = 'none';
+  let shudder = 0;
+  const shudderInt = setInterval(()=>{
+    shudder++;
+    cover.style.transform = `translateX(${(Math.random()-0.5)*6}px) rotate(${(Math.random()-0.5)*0.8}deg)`;
+    if(shudder > 8){
+      clearInterval(shudderInt);
+      cover.style.transform = '';
+      // 3. Fade cover out
+      cover.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+      cover.style.opacity = '0';
+      cover.style.transform = 'translateY(-12px)';
+      setTimeout(()=>{
+        cover.style.display = 'none';
+        bookCont.style.display = 'block';
+        buildDots();
+        setTimeout(()=>{
+          DC.style.display='none'; // dust gone
+          resizeFlipCanvas();
+        }, 60);
+      }, 700);
     }
-    const og=SX.createRadialGradient(px,py,0,px,py,g*3);
-    og.addColorStop(0,`rgba(255,245,200,${.28*a})`);og.addColorStop(1,'transparent');
-    SX.beginPath();SX.arc(px,py,g*3,0,Math.PI*2);SX.fillStyle=og;SX.fill();
-    const gg=SX.createRadialGradient(px,py,0,px,py,g);
-    gg.addColorStop(0,`rgba(255,255,255,${a})`);
-    gg.addColorStop(.35,`rgba(255,245,200,${a})`);
-    gg.addColorStop(.7,`rgba(255,220,140,${.6*a})`);
-    gg.addColorStop(1,'rgba(255,200,80,0)');
-    SX.beginPath();SX.arc(px,py,g,0,Math.PI*2);SX.fillStyle=gg;SX.fill();
-  }
-  function loop(){
-    SX.clearRect(0,0,SC.width,SC.height);
-    if(!merged){
-      ot++;ang+=.042;
-      const rx=Math.min(SC.width,SC.height)*.17,ry=rx*.38;
-      sA.x=cx+Math.cos(ang)*rx;sA.y=cy+Math.sin(ang)*ry;
-      sB.x=cx+Math.cos(ang+Math.PI)*rx;sB.y=cy+Math.sin(ang+Math.PI)*ry;
-      sA.trail.push({x:sA.x,y:sA.y});if(sA.trail.length>TM)sA.trail.shift();
-      sB.trail.push({x:sB.x,y:sB.y});if(sB.trail.length>TM)sB.trail.shift();
-      ds(sA.x,sA.y,sA.trail,20,1);ds(sB.x,sB.y,sB.trail,20,1);
-      if(ot>=100)merged=true;
-      requestAnimationFrame(loop);
-    } else {
-      mt++;ang+=.08;
-      const p=Math.min(mt/65,1),ep=p*p;
-      const rx=Math.min(SC.width,SC.height)*.17*(1-ep),ry=rx*.38;
-      sA.x=cx+Math.cos(ang)*rx;sA.y=cy+Math.sin(ang)*ry;
-      sB.x=cx+Math.cos(ang+Math.PI)*rx;sB.y=cy+Math.sin(ang+Math.PI)*ry;
-      sA.trail.push({x:sA.x,y:sA.y});if(sA.trail.length>TM)sA.trail.shift();
-      sB.trail.push({x:sB.x,y:sB.y});if(sB.trail.length>TM)sB.trail.shift();
-      ds(sA.x,sA.y,sA.trail,20+ep*28,1-ep*.8);
-      ds(sB.x,sB.y,sB.trail,20+ep*28,1-ep*.8);
-      const fg=SX.createRadialGradient(cx,cy,0,cx,cy,ep*100);
-      fg.addColorStop(0,`rgba(255,255,255,${ep*.85})`);
-      fg.addColorStop(.4,`rgba(255,240,180,${ep*.4})`);
-      fg.addColorStop(1,'transparent');
-      SX.beginPath();SX.arc(cx,cy,ep*100,0,Math.PI*2);SX.fillStyle=fg;SX.fill();
-      if(p<1)requestAnimationFrame(loop);
-      else{SX.clearRect(0,0,SC.width,SC.height);cb();}
-    }
-  }
-  requestAnimationFrame(loop);
+  }, 55);
 }
 
-// ── BOOK LOGIC ──
-const cover=document.getElementById('cover');
-const PAGES=[1,2,3,4,5].map(n=>document.getElementById('pg'+n));
-const TOTAL=PAGES.length;
-let cur=0; // how many pages have been flipped
-let bookOpen=false;
+cover.addEventListener('click', e=>openBook(e.clientX, e.clientY));
 
-// Page "side" tracking: when cur is X pages flipped,
-// current visible face:
-//   if cur===0 → pg1 front
-//   if cur===1 → pg1 back (because pg1 flipped, showing its back)
-//   BUT we want SINGLE page at a time:
-//   each nextPage flips one page, revealing either back of current or front of next
-// Simplified: each page flip reveals next content. 
-// pg1 front = page 1, pg1 back = blank, pg2 front = page 2, etc.
-// So each nextPage() flips pages[cur] and cur++.
+// ═══════════════════════════════════════
+//  PAGE TURNING — FULL-PAGE CANVAS FLIP
+// ═══════════════════════════════════════
+const TOTAL = 5;
+let cur = 0;
+let flipping = false;
 
-const DOT_IDS=['nd1','nd2','nd3','nd3b','nd4','nd4b','nd5'];
+const pages = Array.from({length:TOTAL}, (_,i)=>document.getElementById('pg'+i));
 
+// Canvas overlay for the page-turn animation
+const flipCanvas = document.createElement('canvas');
+flipCanvas.style.cssText = 'position:absolute;inset:0;z-index:500;pointer-events:none;';
+document.getElementById('bookContainer').appendChild(flipCanvas);
+const FC = flipCanvas.getContext('2d');
+
+function resizeFlipCanvas(){
+  const stage = document.getElementById('stage');
+  flipCanvas.width  = stage.offsetWidth;
+  flipCanvas.height = stage.offsetHeight;
+}
+window.addEventListener('resize', resizeFlipCanvas);
+
+// Draw a paper-textured rectangle on canvas
+function drawPageTexture(ctx, x, y, w, h, color){
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, w, h);
+  // ruled lines
+  ctx.save();
+  ctx.globalAlpha = 0.05;
+  ctx.fillStyle = 'rgba(150,130,90,1)';
+  for(let ly = y+27; ly < y+h; ly += 27){
+    ctx.fillRect(x, ly, w, 1);
+  }
+  ctx.restore();
+}
+
+function flipTo(next, dir){
+  if(flipping || next < 0 || next >= TOTAL || next === cur) return;
+  flipping = true;
+  resizeFlipCanvas();
+
+  const W = flipCanvas.width;
+  const H = flipCanvas.height;
+  const DURATION = 600;
+  const start = performance.now();
+  const from = cur;
+
+  // Immediately show destination behind, old page will be drawn on canvas
+  pages[from].classList.remove('visible');
+  pages[next].classList.add('visible');
+  cur = next;
+  refreshDots();
+
+  // Page color of the departing page
+  const pfEl = pages[from].querySelector('.pf');
+  const fromBg = pfEl && pfEl.style.background && pfEl.style.background.includes('paper2') ? '#ede5cc' : '#f7f0e0';
+  const versoBg = '#ede5cc';
+
+  function ease(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+
+  let rafId;
+  function animate(now){
+    const rawT = Math.min((now - start) / DURATION, 1);
+    const t = ease(rawT);
+    FC.clearRect(0, 0, W, H);
+
+    // angle: 0 → π
+    const angle = t * Math.PI;
+    // projW: W → 0 → W  (shrinks then grows)
+    const projW = Math.abs(Math.cos(angle)) * W;
+    const phase1 = t < 0.5; // first half: old page peeling away
+    const shadowA = Math.sin(angle) * 0.6;
+
+    if(dir > 0){
+      // FORWARD: binding on LEFT, page peels right-to-left
+      // Phase 1: old page shrinks from right. Leaf = left portion x:[0..projW]
+      // Phase 2: verso expands from left. Verso = left portion x:[0..projW]
+      if(phase1){
+        if(projW > 0){
+          FC.save();
+          FC.beginPath(); FC.rect(0, 0, projW, H); FC.clip();
+          drawPageTexture(FC, 0, 0, projW, H, fromBg);
+          // shadow on RIGHT edge of turning leaf (the fold/crease)
+          const sw = Math.min(projW, 120);
+          const sg = FC.createLinearGradient(projW, 0, projW - sw, 0);
+          sg.addColorStop(0, `rgba(0,0,0,${shadowA * 0.8})`);
+          sg.addColorStop(1, 'rgba(0,0,0,0)');
+          FC.fillStyle = sg;
+          FC.fillRect(projW - sw, 0, sw, H);
+          FC.restore();
+        }
+        // slight shadow on newly revealed right area (destination page)
+        if(projW < W){
+          const dsw = Math.min(W - projW, W * 0.25);
+          const dsg = FC.createLinearGradient(projW, 0, projW + dsw, 0);
+          dsg.addColorStop(0, `rgba(0,0,0,${shadowA * 0.35})`);
+          dsg.addColorStop(1, 'rgba(0,0,0,0)');
+          FC.fillStyle = dsg;
+          FC.fillRect(projW, 0, W - projW, H);
+        }
+      } else {
+        // Phase 2: verso visible on left, expanding rightward
+        if(projW > 0){
+          FC.save();
+          FC.beginPath(); FC.rect(0, 0, projW, H); FC.clip();
+          drawPageTexture(FC, 0, 0, projW, H, versoBg);
+          // shadow on LEFT edge of verso (binding side)
+          const sw = Math.min(projW, 80);
+          const sg = FC.createLinearGradient(0, 0, sw, 0);
+          sg.addColorStop(0, `rgba(0,0,0,${shadowA * 0.5})`);
+          sg.addColorStop(1, 'rgba(0,0,0,0)');
+          FC.fillStyle = sg;
+          FC.fillRect(0, 0, projW, H);
+          FC.restore();
+        }
+      }
+
+    } else {
+      // BACKWARD: page peels left-to-right (page comes FROM right)
+      // Phase 1: old page shrinks from left. Leaf = right portion x:[W-projW..W]
+      // Phase 2: verso expands from right. Verso = right portion x:[W-projW..W]
+      if(phase1){
+        const x0 = W - projW;
+        if(projW > 0){
+          FC.save();
+          FC.beginPath(); FC.rect(x0, 0, projW, H); FC.clip();
+          drawPageTexture(FC, x0, 0, projW, H, fromBg);
+          // shadow on LEFT edge of turning leaf
+          const sw = Math.min(projW, 120);
+          const sg = FC.createLinearGradient(x0, 0, x0 + sw, 0);
+          sg.addColorStop(0, `rgba(0,0,0,${shadowA * 0.8})`);
+          sg.addColorStop(1, 'rgba(0,0,0,0)');
+          FC.fillStyle = sg;
+          FC.fillRect(x0, 0, sw, H);
+          FC.restore();
+        }
+        // shadow on newly revealed left area
+        if(x0 > 0){
+          const dsw = Math.min(x0, W * 0.25);
+          const dsg = FC.createLinearGradient(x0, 0, x0 - dsw, 0);
+          dsg.addColorStop(0, `rgba(0,0,0,${shadowA * 0.35})`);
+          dsg.addColorStop(1, 'rgba(0,0,0,0)');
+          FC.fillStyle = dsg;
+          FC.fillRect(0, 0, x0, H);
+        }
+      } else {
+        // Phase 2: verso on right side, expanding leftward
+        const x0 = W - projW;
+        if(projW > 0){
+          FC.save();
+          FC.beginPath(); FC.rect(x0, 0, projW, H); FC.clip();
+          drawPageTexture(FC, x0, 0, projW, H, versoBg);
+          // shadow on RIGHT edge
+          const sw = Math.min(projW, 80);
+          const sg = FC.createLinearGradient(W, 0, W - sw, 0);
+          sg.addColorStop(0, `rgba(0,0,0,${shadowA * 0.5})`);
+          sg.addColorStop(1, 'rgba(0,0,0,0)');
+          FC.fillStyle = sg;
+          FC.fillRect(x0, 0, projW, H);
+          FC.restore();
+        }
+      }
+    }
+
+    if(rawT < 1){
+      rafId = requestAnimationFrame(animate);
+    } else {
+      FC.clearRect(0, 0, W, H);
+      flipping = false;
+    }
+  }
+  rafId = requestAnimationFrame(animate);
+}
+
+function nextPage(e){ if(e) e.stopPropagation(); flipTo(cur+1, 1); }
+function prevPage(e){ if(e) e.stopPropagation(); flipTo(cur-1,-1); }
+
+function goToCover(e){
+  if(e) e.stopPropagation();
+  if(flipping || !bookOpen) return;
+  flipping = true;
+  resizeFlipCanvas();
+
+  const W = flipCanvas.width;
+  const H = flipCanvas.height;
+  const DURATION = 680;
+  const start = performance.now();
+
+  // Hide current page, show cover
+  pages[cur].classList.remove('visible');
+  cur = 0;
+
+  function ease(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+
+  let rafId;
+  function animateCover(now){
+    const rawT = Math.min((now - start)/DURATION, 1);
+    const t = ease(rawT);
+    FC.clearRect(0,0,W,H);
+
+    // Page sweeps from left to right (going "back" to cover)
+    const angle  = t * Math.PI;
+    const projW  = Math.abs(Math.cos(angle)) * W;
+    const firstH = angle < Math.PI/2;
+    const shadowA = Math.sin(angle) * 0.5;
+
+    if(firstH){
+      const x0 = W - projW;
+      if(projW > 1){
+        FC.save();
+        FC.beginPath(); FC.rect(x0,0,projW,H); FC.clip();
+        FC.fillStyle = '#f7f0e0'; FC.fillRect(x0,0,projW,H);
+        const sg = FC.createLinearGradient(x0,0,Math.min(x0+80,W),0);
+        sg.addColorStop(0,`rgba(0,0,0,${shadowA*0.9})`);
+        sg.addColorStop(1,'rgba(0,0,0,0)');
+        FC.fillStyle=sg; FC.fillRect(x0,0,projW,H);
+        FC.restore();
+      }
+      if(x0 > 0){
+        const lsg = FC.createLinearGradient(x0,0,Math.max(x0-W*0.25,0),0);
+        lsg.addColorStop(0,`rgba(0,0,0,${shadowA*0.55})`);
+        lsg.addColorStop(1,'rgba(0,0,0,0)');
+        FC.fillStyle=lsg; FC.fillRect(0,0,x0,H);
+      }
+    } else {
+      // Reveal cover (dark) beneath
+      const x0 = W - projW;
+      if(projW > 1){
+        FC.save();
+        FC.beginPath(); FC.rect(x0,0,projW,H); FC.clip();
+        FC.fillStyle = '#180c05'; FC.fillRect(x0,0,projW,H);
+        const sg = FC.createLinearGradient(W,0,Math.max(W-80,x0),0);
+        sg.addColorStop(0,`rgba(0,0,0,${shadowA*0.6})`);
+        sg.addColorStop(1,'rgba(0,0,0,0)');
+        FC.fillStyle=sg; FC.fillRect(x0,0,projW,H);
+        FC.restore();
+      }
+    }
+
+    if(rawT < 1){
+      rafId = requestAnimationFrame(animateCover);
+    } else {
+      FC.clearRect(0,0,W,H);
+      // Show cover, hide book, reset to page 0
+      pages[cur].classList.remove('visible');
+      cur = 0;
+      pages[0].classList.add('visible');
+      bookCont.style.display='none';
+      cover.style.display='';
+      cover.style.opacity='1';
+      cover.style.transform='';
+      cover.style.pointerEvents='auto';
+      // Re-init dust
+      DC.style.display='';
+      dustCleared = false;
+      bookOpen = false;
+      initDust();
+      (function redrawDust(){
+        DX.clearRect(0,0,DC.width,DC.height);
+        for(let p of dustParticles){
+          const a = p.alpha;
+          const color = p.hue > 0
+            ? `hsla(${p.hue},${p.sat}%,85%,${a})`
+            : `rgba(210,190,155,${a})`;
+          DX.beginPath();
+          DX.arc(p.x, p.y, p.r, 0, Math.PI*2);
+          DX.fillStyle = color;
+          DX.fill();
+        }
+        drawDustVignette();
+      })();
+      flipping = false;
+    }
+  }
+  rafId = requestAnimationFrame(animateCover);
+}
+
+// ═══════════════════════════════════════
+//  DOTS
+// ═══════════════════════════════════════
 function buildDots(){
-  DOT_IDS.forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el)return;
+  for(let i=0;i<TOTAL;i++){
+    const el = document.getElementById('d'+i);
+    if(!el) continue;
     el.innerHTML='';
-    for(let i=0;i<TOTAL;i++){
-      const d=document.createElement('div');
-      d.className='dot';
+    for(let j=0;j<TOTAL;j++){
+      const d = document.createElement('div');
+      d.className='dot'+(j===0?' on':'');
       el.appendChild(d);
     }
-  });
-  refreshDots();
+  }
 }
-
 function refreshDots(){
-  DOT_IDS.forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el)return;
-    el.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i===cur));
-  });
+  for(let i=0;i<TOTAL;i++){
+    const el=document.getElementById('d'+i);
+    if(!el)continue;
+    el.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('on',j===cur));
+  }
 }
 
-function openBook(){
-  if(bookOpen)return;
-  bookOpen=true;
-  const r=document.getElementById('book').getBoundingClientRect();
-  runSouls(r.left+r.width/2,r.top+r.height/2,()=>{
-    cover.classList.add('opened');
-    setTimeout(buildDots,1100);
-  });
+// ═══════════════════════════════════════
+//  WIRE BUTTONS
+// ═══════════════════════════════════════
+function wire(id, fn){
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('click', fn);
 }
+wire('btn0l', goToCover); wire('btn0r', nextPage);
+wire('btn1l', prevPage); wire('btn1r', nextPage);
+wire('btn2l', prevPage); wire('btn2r', nextPage);
+wire('btn3l', prevPage); wire('btn3r', nextPage);
+wire('btn4l', prevPage);
 
-function nextPage(e){
-  if(e){e.stopPropagation();}
-  if(cur>=TOTAL)return;
-  PAGES[cur].classList.add('flipped');
-  cur++;
-  refreshDots();
-}
-
-function prevPage(e){
-  if(e){e.stopPropagation();}
-  if(cur<=0)return;
-  cur--;
-  PAGES[cur].classList.remove('flipped');
-  refreshDots();
-}
-
-// touch/click on cover
-cover.addEventListener('click',openBook);
-
-// keyboard
-document.addEventListener('keydown',e=>{
-  if(!bookOpen){openBook();return;}
-  if(e.key==='ArrowRight')nextPage(null);
-  if(e.key==='ArrowLeft')prevPage(null);
+// ═══════════════════════════════════════
+//  KEYBOARD + SWIPE
+// ═══════════════════════════════════════
+document.addEventListener('keydown', e=>{
+  if(!bookOpen){ openBook(); return; }
+  if(e.key==='ArrowRight') nextPage(null);
+  if(e.key==='ArrowLeft')  prevPage(null);
 });
-
-// swipe
 let tx=0;
-document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+document.addEventListener('touchstart',e=>{ tx=e.touches[0].clientX; },{passive:true});
 document.addEventListener('touchend',e=>{
-  if(!bookOpen)return;
-  const dx=e.changedTouches[0].clientX-tx;
-  if(Math.abs(dx)<45)return;
-  if(dx<0)nextPage(null);else prevPage(null);
+  if(!bookOpen) return;
+  const dx=e.changedTouches[0].clientX - tx;
+  if(Math.abs(dx)<50) return;
+  dx<0 ? nextPage(null) : prevPage(null);
 },{passive:true});
 </script>
 </body>
