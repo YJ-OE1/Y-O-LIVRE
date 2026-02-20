@@ -9,10 +9,10 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
   --gold:#c8a84b;
-  --paper:#f7f0e0;
-  --paper2:#ede5cc;
-  --ink:#1e1208;
-  --ink2:#4a3520;
+  --paper:#f2e6c9;
+  --paper2:#e8d9b0;
+  --ink:#18100a;
+  --ink2:#3d2a14;
 }
 html,body{
   width:100%;height:100%;overflow:hidden;
@@ -195,15 +195,46 @@ html,body{
   position:absolute;inset:0;
   overflow:hidden;
 }
-.pf{ background:var(--paper); }
-.pb{ background:var(--paper2); }
 
-.pf::after,.pb::after{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+/* Base parchment — chaud, légèrement inégal */
+.pf{
   background:
-    linear-gradient(to right, rgba(0,0,0,0.055) 0%, transparent 5%, transparent 95%, rgba(0,0,0,0.03) 100%),
-    linear-gradient(to bottom, rgba(0,0,0,0.025) 0%, transparent 3%),
-    repeating-linear-gradient(0deg,transparent,transparent 26px,rgba(160,140,100,0.09) 26px,rgba(160,140,100,0.09) 27px);
+    radial-gradient(ellipse at 18% 22%, #ede0c0 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 75%, #e4d5a8 0%, transparent 50%),
+    radial-gradient(ellipse at 55% 10%, #f0e5c8 0%, transparent 40%),
+    linear-gradient(160deg, #f2e6c9 0%, #e8d9b0 40%, #ecdcb4 70%, #e5d4a6 100%);
+}
+.pb{
+  background:
+    radial-gradient(ellipse at 22% 78%, #e0d09e 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 20%, #e9ddb8 0%, transparent 45%),
+    linear-gradient(155deg, #eaddb5 0%, #e2d3a2 50%, #e7d8ac 100%);
+}
+
+/* Grain de papier ancien */
+.pf::before,.pb::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.15'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='0.28'/%3E%3C/svg%3E");
+  background-size: 180px;
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+}
+
+/* Bords brunis + réglures + rousseurs */
+.pf::after,.pb::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
+  background:
+    linear-gradient(to right, rgba(100,70,20,0.18) 0%, rgba(100,70,20,0.06) 3%, transparent 9%),
+    linear-gradient(to left,  rgba(80,55,15,0.10) 0%, transparent 6%),
+    linear-gradient(to bottom,rgba(80,55,15,0.12) 0%, transparent 5%),
+    linear-gradient(to top,   rgba(80,55,15,0.14) 0%, transparent 6%),
+    radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(100,70,20,0.07) 100%),
+    repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(120,90,30,0.055) 27px, rgba(120,90,30,0.055) 28px),
+    radial-gradient(ellipse at 12% 38%, rgba(140,100,30,0.06) 0%, transparent 18%),
+    radial-gradient(ellipse at 88% 20%, rgba(120,85,20,0.05) 0%, transparent 14%),
+    radial-gradient(ellipse at 65% 82%, rgba(130,95,25,0.07) 0%, transparent 16%),
+    radial-gradient(ellipse at 30% 68%, rgba(110,80,20,0.04) 0%, transparent 12%);
 }
 
 .pc{
@@ -226,13 +257,13 @@ html,body{
   position:absolute;bottom:0;left:0;right:0;height:52px;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 14px;
-  background:linear-gradient(to top, rgba(247,240,224,1) 60%, rgba(247,240,224,0) 100%);
+  background:linear-gradient(to top, rgba(242,230,201,1) 60%, rgba(242,230,201,0) 100%);
   z-index:10;
-  border-top:1px solid rgba(200,168,75,0.07);
+  border-top:1px solid rgba(200,168,75,0.10);
 }
 .pb .pg-nav,
 .paper2-nav{
-  background:linear-gradient(to top, rgba(237,229,204,1) 60%, rgba(237,229,204,0) 100%);
+  background:linear-gradient(to top, rgba(232,217,176,1) 60%, rgba(232,217,176,0) 100%);
 }
 .nav-btn{
   background:rgba(200,168,75,0.07);
@@ -613,7 +644,7 @@ html,body{
         <p class="pc-body sm" style="opacity:0.5;">Casablanca · Maroc</p>
         <div class="pc-folio" style="margin-top:6px;">IV</div>
       </div>
-      <div class="pg-nav" style="background:linear-gradient(to top,rgba(237,229,204,1) 60%,rgba(237,229,204,0) 100%);">
+      <div class="pg-nav" style="background:linear-gradient(to top,rgba(232,217,176,1) 60%,rgba(232,217,176,0) 100%);">
         <button class="nav-btn" id="btn3l">&#8592;</button>
         <div class="nav-dots" id="d3"></div>
         <button class="nav-btn" id="btn3r">&#8594;</button>
