@@ -285,6 +285,46 @@ html,body{
 .prog-ev{font-family:'IM Fell English',serif;font-size:clamp(0.85rem,3.5vw,1rem);font-style:italic;color:var(--ink);}
 .prog-sub{font-family:'Montserrat',sans-serif;font-size:0.5rem;color:var(--ink2);opacity:0.6;}
 @keyframes hb{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+
+/* ═══ PAGE 6 — plume + coeur ═══ */
+.pg6-scene{
+  position:relative;
+  width:clamp(180px,50vw,220px);
+  margin:0 auto 6px;
+  /* hauteur = taille du coeur + débordement plume en haut */
+  height:clamp(190px,52vw,240px);
+}
+/* Le coeur en bas du conteneur */
+.pg6-heart{
+  position:absolute;
+  bottom:0;left:50%;transform:translateX(-50%);
+  width:clamp(150px,42vw,190px);
+  mix-blend-mode:multiply;
+  opacity:0.88;
+  filter:sepia(0.3) contrast(1.05);
+  animation:heartPulse 3s ease-in-out infinite;
+}
+/* La plume positionnée en haut-droite du coeur, pointe vers le centre-haut du coeur */
+.pg6-quill{
+  position:absolute;
+  /* pointe de la plume vers le haut-droit du coeur, corps en dehors */
+  bottom: clamp(150px, 26vw, 120px);
+  right: clamp(148px, 0vw, 0px);
+  width:clamp(80px,22vw,105px);
+  mix-blend-mode:multiply;
+  opacity:0.88;
+  filter:sepia(0.35) contrast(1.1);
+  /* pointe vers le bas-gauche = rotation ~210deg = la plume "écrit" le coeur */
+  transform:rotate(30deg);
+  animation:quillDraw 4s ease-in-out infinite;
+  transform-origin: bottom center; /* pivot à la pointe */
+}
+@keyframes quillDraw{
+  0%,100%{ transform:rotate(30deg) translate(0,0); }
+  50%{     transform:rotate(27deg) translate(1px,-3px); }
+}
+@keyframes heartPulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.04)}}
+@keyframes quillFloat{0%,100%{transform:rotate(-18deg) translateX(18px) translateY(0)}50%{transform:rotate(-16deg) translateX(18px) translateY(-6px)}}
 </style>
 </head>
 <body>
@@ -597,6 +637,50 @@ html,body{
       <div class="pg-nav">
         <button class="nav-btn" id="btn4l">&#8592;</button>
         <div class="nav-dots" id="d4"></div>
+        <button class="nav-btn" id="btn4r">&#8594;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 6 — Not The End -->
+  <div class="page" id="pg5">
+    <div class="pf" style="background:var(--paper);">
+      <div class="pc" style="justify-content:center;gap:0;">
+
+        <!-- Plume + Coeur groupés dans un seul conteneur relatif -->
+        <div class="pg6-scene">
+          <!-- Coeur empreinte en bas -->
+          <img src="assets/coeur.png" alt="coeur empreinte" class="pg6-heart">
+          <!-- Plume superposée, pointe vers le haut du coeur -->
+          <img src="assets/plume.png" alt="plume" class="pg6-quill">
+        </div>
+
+        <!-- NOT THE END -->
+        <div style="text-align:center;margin-top:4px;">
+          <div style="font-family:'Cinzel',serif;font-size:clamp(0.38rem,1.6vw,0.48rem);
+                      letter-spacing:6px;color:var(--gold);opacity:0.5;text-transform:uppercase;
+                      margin-bottom:4px;">— mais plutôt —</div>
+          <div style="font-family:'Great Vibes',cursive;
+                      font-size:clamp(2.8rem,13vw,4.2rem);
+                      color:var(--ink);line-height:1;
+                      text-shadow:0 2px 8px rgba(0,0,0,0.08);">Not The End</div>
+          <div style="font-family:'Cinzel',serif;font-size:clamp(0.38rem,1.6vw,0.48rem);
+                      letter-spacing:5px;color:var(--gold);opacity:0.45;text-transform:uppercase;
+                      margin-top:6px;">le début de tout</div>
+        </div>
+
+        <div class="pc-rule" style="margin-top:14px;"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+
+        <p class="pc-body sm" style="margin-top:8px;opacity:0.55;font-size:clamp(0.72rem,3vw,0.84rem);">
+          Youssef &amp; Oumaima<br>
+          <span style="font-family:'Cinzel',serif;font-size:0.46rem;letter-spacing:3px;opacity:0.7;">4 · 04 · 2026</span>
+        </p>
+
+        <div class="pc-folio" style="margin-top:10px;">VI</div>
+      </div>
+      <div class="pg-nav">
+        <button class="nav-btn" id="btn5l">&#8592;</button>
+        <div class="nav-dots" id="d5"></div>
         <button class="nav-btn" disabled>&#8594;</button>
       </div>
     </div>
@@ -813,35 +897,26 @@ function tick(){
 tick(); setInterval(tick,1000);
 
 // ═══════════════════════════════════════
-//  AUDIO — FIXED: no infinite recursion,
-//  proper loading guard, clean state machine
+//  AUDIO
 // ═══════════════════════════════════════
 let _audioCtx    = null;
 let _pageSoundBuf = null;
-let _audioLoading = false;  // prevents concurrent fetch calls
-let _audioReady   = false;  // true once buffer is decoded & ready
+let _audioLoading = false;
+let _audioReady   = false;
 
 async function _initPageSound() {
-  // If already loaded or currently loading, do nothing
   if (_audioReady || _audioLoading) return;
   _audioLoading = true;
 
   try {
-    // Create AudioContext only once
     _audioCtx = _audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-
-    // AudioContext may be suspended until a user gesture — resume it
     if (_audioCtx.state === 'suspended') await _audioCtx.resume();
-
     const response = await fetch('assets/page.mp3');
     if (!response.ok) throw new Error('HTTP ' + response.status);
-
     const arrayBuffer = await response.arrayBuffer();
     _pageSoundBuf = await _audioCtx.decodeAudioData(arrayBuffer);
     _audioReady = true;
-
   } catch (e) {
-    // Sound failed to load — gracefully continue without audio
     console.warn('Page-turn sound load failed:', e);
   } finally {
     _audioLoading = false;
@@ -849,32 +924,24 @@ async function _initPageSound() {
 }
 
 function playPageTurnSound() {
-  // Sound not ready yet — kick off a load attempt (once), then return silently
   if (!_audioReady) {
     if (!_audioLoading) _initPageSound();
     return;
   }
-
   try {
-    // Resume context if browser suspended it between interactions
     if (_audioCtx.state === 'suspended') _audioCtx.resume();
-
     const src  = _audioCtx.createBufferSource();
     src.buffer = _pageSoundBuf;
-
     const gain = _audioCtx.createGain();
     gain.gain.value = 0.8;
-
     src.connect(gain);
     gain.connect(_audioCtx.destination);
     src.start();
-
   } catch (e) {
     console.warn('Sound play failed:', e);
   }
 }
 
-// Pre-load audio on the very first user gesture (covers autoplay policy)
 document.addEventListener('pointerdown', _initPageSound, { once: true });
 
 // ═══════════════════════════════════════
@@ -931,7 +998,7 @@ cover.addEventListener('click', e=>openBook(e.clientX, e.clientY));
 // ═══════════════════════════════════════
 //  PAGE TURNING
 // ═══════════════════════════════════════
-const TOTAL = 5;
+const TOTAL = 6;
 let cur = 0;
 let flipping = false;
 
@@ -1190,7 +1257,8 @@ wire('btn0l', goToCover); wire('btn0r', nextPage);
 wire('btn1l', prevPage);  wire('btn1r', nextPage);
 wire('btn2l', prevPage);  wire('btn2r', nextPage);
 wire('btn3l', prevPage);  wire('btn3r', nextPage);
-wire('btn4l', prevPage);
+wire('btn4l', prevPage);  wire('btn4r', nextPage);
+wire('btn5l', prevPage);
 
 // ═══════════════════════════════════════
 //  KEYBOARD + SWIPE
