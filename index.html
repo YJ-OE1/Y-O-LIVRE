@@ -180,23 +180,30 @@ html,body{
   position:absolute;inset:0;
   display:none;
   overflow:hidden;
-  perspective:2000px;
-  perspective-origin:50% 50%;
+  perspective:900px;
+  perspective-origin:left center;
 }
 
 .page{
   position:absolute;inset:0;
-  display:none;
+  transform-style:preserve-3d;
+  transform-origin:left center;
+  transition:transform 1s cubic-bezier(0.645,0.045,0.355,1);
+  pointer-events:auto;
+}
+.page.flipped{
+  transform:rotateY(-172deg);
   pointer-events:none;
 }
-.page.visible{ display:block; pointer-events:auto; }
+.pf{ backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+.pb{ backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:rotateY(180deg); }
 
 .pf,.pb{
   position:absolute;inset:0;
   overflow:hidden;
 }
 
-/* Base parchment — chaud, légèrement inégal */
+/* Base parchment */
 .pf{
   background:
     radial-gradient(ellipse at 18% 22%, #ede0c0 0%, transparent 55%),
@@ -221,7 +228,7 @@ html,body{
   opacity: 0.85;
 }
 
-/* Bords brunis + réglures + rousseurs */
+/* Bords brunis */
 .pf::after,.pb::after{
   content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
   background:
@@ -322,10 +329,8 @@ html,body{
   position:relative;
   width:clamp(180px,50vw,220px);
   margin:0 auto 6px;
-  /* hauteur = taille du coeur + débordement plume en haut */
   height:clamp(190px,52vw,240px);
 }
-/* Le coeur en bas du conteneur */
 .pg6-heart{
   position:absolute;
   bottom:0;left:50%;transform:translateX(-50%);
@@ -335,20 +340,17 @@ html,body{
   filter:sepia(0.3) contrast(1.05);
   animation:heartPulse 3s ease-in-out infinite;
 }
-/* La plume positionnée en haut-droite du coeur, pointe vers le centre-haut du coeur */
 .pg6-quill{
   position:absolute;
-  /* pointe de la plume vers le haut-droit du coeur, corps en dehors */
   bottom: clamp(150px, 26vw, 120px);
   right: clamp(148px, 0vw, 0px);
   width:clamp(80px,22vw,105px);
   mix-blend-mode:multiply;
   opacity:0.88;
   filter:sepia(0.35) contrast(1.1);
-  /* pointe vers le bas-gauche = rotation ~210deg = la plume "écrit" le coeur */
   transform:rotate(30deg);
   animation:quillDraw 4s ease-in-out infinite;
-  transform-origin: bottom center; /* pivot à la pointe */
+  transform-origin: bottom center;
 }
 @keyframes quillDraw{
   0%,100%{ transform:rotate(30deg) translate(0,0); }
@@ -499,31 +501,124 @@ html,body{
   </div>
 </div>
 
-<!-- PAGES -->
+<!-- PAGES — ordre z-index : pg5 en bas, pg0 en haut de la pile -->
 <div id="bookContainer">
 
-  <!-- Page 1 -->
-  <div class="page visible" id="pg0">
-    <div class="pf">
-      <div class="pc" style="justify-content:center;">
-        <div class="pc-chapter">Chapitre I</div>
-        <svg width="40" height="40" viewBox="0 0 60 60" style="margin:4px 0 8px;"><circle cx="30" cy="30" r="26" stroke="rgba(200,168,75,0.2)" stroke-width="0.6" fill="none"/><path d="M30 4C33 14 42 18 30 30C18 18 27 14 30 4Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/><path d="M56 30C46 33 42 42 30 30C42 18 46 27 56 30Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/><path d="M30 56C27 46 18 42 30 30C42 42 33 46 30 56Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/><path d="M4 30C14 27 18 18 30 30C18 42 14 33 4 30Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/><circle cx="30" cy="30" r="3" fill="rgba(200,168,75,0.35)"/></svg>
-        <div class="pc-title" style="font-size:clamp(2.2rem,10vw,3rem);">Youssef<br><span style="font-size:0.55em;color:var(--ink2);">&amp;</span><br>Oumaima</div>
-        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
-        <p class="pc-body plain sm" style="font-family:'Cinzel',serif;font-size:clamp(0.48rem,2vw,0.6rem);letter-spacing:4px;opacity:0.5;margin-top:2px;">INVITATION AU MARIAGE</p>
-        <p class="pc-body sm" style="margin-top:10px;opacity:0.62;">Nous avons l'honneur de vous convier<br>à célébrer avec nous le plus beau<br>jour de notre vie.</p>
-        <div class="pc-folio" style="margin-top:10px;">I</div>
+  <!-- Page 6 — Not The End (z-index le plus bas) -->
+  <div class="page" id="pg5" style="z-index:4;">
+    <div class="pf" style="background:var(--paper);">
+      <div class="pc" style="justify-content:center;gap:0;">
+
+        <div class="pg6-scene">
+          <img src="assets/coeur.png" alt="coeur empreinte" class="pg6-heart">
+          <img src="assets/plume.png" alt="plume" class="pg6-quill">
+        </div>
+
+        <div style="text-align:center;margin-top:4px;">
+          <div style="font-family:'Cinzel',serif;font-size:clamp(0.38rem,1.6vw,0.48rem);
+                      letter-spacing:6px;color:var(--gold);opacity:0.5;text-transform:uppercase;
+                      margin-bottom:4px;">— mais plutôt —</div>
+          <div style="font-family:'Great Vibes',cursive;
+                      font-size:clamp(2.8rem,13vw,4.2rem);
+                      color:var(--ink);line-height:1;
+                      text-shadow:0 2px 8px rgba(0,0,0,0.08);">Not The End</div>
+          <div style="font-family:'Cinzel',serif;font-size:clamp(0.38rem,1.6vw,0.48rem);
+                      letter-spacing:5px;color:var(--gold);opacity:0.45;text-transform:uppercase;
+                      margin-top:6px;">le début de tout</div>
+        </div>
+
+        <div class="pc-rule" style="margin-top:14px;"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+
+        <p class="pc-body sm" style="margin-top:8px;opacity:0.55;font-size:clamp(0.72rem,3vw,0.84rem);">
+          Youssef &amp; Oumaima<br>
+          <span style="font-family:'Cinzel',serif;font-size:0.46rem;letter-spacing:3px;opacity:0.7;">4 · 04 · 2026</span>
+        </p>
+
+        <div class="pc-folio" style="margin-top:10px;">VI</div>
       </div>
       <div class="pg-nav">
-        <button class="nav-btn" id="btn0l">&#8592;</button>
-        <div class="nav-dots" id="d0"></div>
-        <button class="nav-btn" id="btn0r">&#8594;</button>
+        <button class="nav-btn" id="btn5l">&#8592;</button>
+        <div class="nav-dots" id="d5"></div>
+        <button class="nav-btn" disabled>&#8594;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 5 -->
+  <div class="page" id="pg4" style="z-index:5;">
+    <div class="pf">
+      <div class="pc" style="justify-content:center;">
+        <div class="pc-chapter">Épilogue</div>
+        <div class="pc-title">Avec Amour</div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+        <p class="pc-body" style="margin-top:8px;">Votre présence est le plus beau<br>des cadeaux que vous puissiez<br>nous offrir.</p>
+        <div style="margin:16px 0;font-family:'Great Vibes',cursive;font-size:clamp(1.6rem,7vw,2.2rem);color:var(--ink2);text-align:center;">Youssef &amp; Oumaima</div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+        <p class="pc-body sm" style="margin-top:10px;opacity:0.58;">Nous vous attendons avec impatience<br>le 4 Avril 2026.</p>
+        <div class="pc-folio" style="margin-top:10px;">V</div>
+      </div>
+      <div class="pg-nav">
+        <button class="nav-btn" id="btn4l">&#8592;</button>
+        <div class="nav-dots" id="d4"></div>
+        <button class="nav-btn" id="btn4r">&#8594;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 4 -->
+  <div class="page" id="pg3" style="z-index:6;">
+    <div class="pf" style="background:var(--paper2);">
+      <div class="pc" style="justify-content:center;">
+        <div class="pc-chapter">Plus que...</div>
+        <div class="pc-title">Le Grand Jour</div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+        <div class="cdown" id="countdown">
+          <div class="cu"><span class="cn" id="cdj">--</span><span class="cl">Jours</span></div>
+          <div class="csep">·</div>
+          <div class="cu"><span class="cn" id="cdh">--</span><span class="cl">H</span></div>
+          <div class="csep">·</div>
+          <div class="cu"><span class="cn" id="cdm">--</span><span class="cl">Min</span></div>
+          <div class="csep">·</div>
+          <div class="cu"><span class="cn" id="cds">--</span><span class="cl">Sec</span></div>
+        </div>
+        <div class="ring-w">
+          <svg width="70" height="70" viewBox="0 0 160 160"><defs><linearGradient id="gG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f5d27a"/><stop offset="40%" stop-color="#e8b84b"/><stop offset="60%" stop-color="#c8922a"/><stop offset="100%" stop-color="#f5d27a"/></linearGradient><linearGradient id="dG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8f4ff"/><stop offset="50%" stop-color="#8fc8f0"/><stop offset="100%" stop-color="#deeeff"/></linearGradient></defs><ellipse cx="80" cy="112" rx="38" ry="10" fill="none" stroke="url(#gG)" stroke-width="7"/><line x1="42" y1="112" x2="42" y2="72" stroke="url(#gG)" stroke-width="7"/><line x1="118" y1="112" x2="118" y2="72" stroke="url(#gG)" stroke-width="7"/><ellipse cx="80" cy="72" rx="38" ry="10" fill="url(#gG)"/><polygon points="80,30 92,52 80,48 68,52" fill="url(#dG)" stroke="#8fb8d8" stroke-width="1"/><polygon points="80,30 92,52 80,44" fill="rgba(255,255,255,0.65)"/><polygon points="80,48 92,52 80,58 68,52" fill="url(#dG)" stroke="#8fb8d8" stroke-width="1"/></svg>
+        </div>
+        <p class="pc-body sm" style="opacity:0.5;">Casablanca · Maroc</p>
+        <div class="pc-folio" style="margin-top:6px;">IV</div>
+      </div>
+      <div class="pg-nav" style="background:linear-gradient(to top,rgba(232,217,176,1) 60%,rgba(232,217,176,0) 100%);">
+        <button class="nav-btn" id="btn3l">&#8592;</button>
+        <div class="nav-dots" id="d3"></div>
+        <button class="nav-btn" id="btn3r">&#8594;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 3 -->
+  <div class="page" id="pg2" style="z-index:7;">
+    <div class="pf">
+      <div class="pc">
+        <div class="pc-chapter">Le Lieu</div>
+        <div class="pc-title">Notre Salle</div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+        <img class="vphoto" src="assets/notreSalle.jpeg" alt="Salle"/>
+        <div class="irow"><span class="ico">📍</span>Casablanca, Maroc</div>
+        <div class="irow"><span class="ico">🕖</span>Samedi 4 Avril 2026 · 19h00</div>
+        <div class="irow"><span class="ico">✨</span>Soirée de Gala</div>
+        <a href="https://maps.app.goo.gl/V8ewxEcuPoiRUozn9" target="_blank" class="btn-dir" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;">📍 Voir sur Google Maps →</a>
+        <div class="pc-folio" style="margin-top:8px;">III</div>
+      </div>
+      <div class="pg-nav">
+        <button class="nav-btn" id="btn2l">&#8592;</button>
+        <div class="nav-dots" id="d2"></div>
+        <button class="nav-btn" id="btn2r">&#8594;</button>
       </div>
     </div>
   </div>
 
   <!-- Page 2 -->
-  <div class="page" id="pg1">
+  <div class="page" id="pg1" style="z-index:8;">
     <div class="pf">
       <div class="pc" style="justify-content:flex-start;padding:0;overflow:hidden;">
 
@@ -600,119 +695,22 @@ html,body{
     </div>
   </div>
 
-  <!-- Page 3 -->
-  <div class="page" id="pg2">
-    <div class="pf">
-      <div class="pc">
-        <div class="pc-chapter">Le Lieu</div>
-        <div class="pc-title">Notre Salle</div>
-        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
-        <img class="vphoto" src="assets/notreSalle.jpeg" alt="Salle"/>
-        <div class="irow"><span class="ico">📍</span>Casablanca, Maroc</div>
-        <div class="irow"><span class="ico">🕖</span>Samedi 4 Avril 2026 · 19h00</div>
-        <div class="irow"><span class="ico">✨</span>Soirée de Gala</div>
-        <a href="https://maps.app.goo.gl/V8ewxEcuPoiRUozn9" target="_blank" class="btn-dir" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;">📍 Voir sur Google Maps →</a>
-        <div class="pc-folio" style="margin-top:8px;">III</div>
-      </div>
-      <div class="pg-nav">
-        <button class="nav-btn" id="btn2l">&#8592;</button>
-        <div class="nav-dots" id="d2"></div>
-        <button class="nav-btn" id="btn2r">&#8594;</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Page 4 -->
-  <div class="page" id="pg3">
-    <div class="pf" style="background:var(--paper2);">
-      <div class="pc" style="justify-content:center;">
-        <div class="pc-chapter">Plus que...</div>
-        <div class="pc-title">Le Grand Jour</div>
-        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
-        <div class="cdown" id="countdown">
-          <div class="cu"><span class="cn" id="cdj">--</span><span class="cl">Jours</span></div>
-          <div class="csep">·</div>
-          <div class="cu"><span class="cn" id="cdh">--</span><span class="cl">H</span></div>
-          <div class="csep">·</div>
-          <div class="cu"><span class="cn" id="cdm">--</span><span class="cl">Min</span></div>
-          <div class="csep">·</div>
-          <div class="cu"><span class="cn" id="cds">--</span><span class="cl">Sec</span></div>
-        </div>
-        <div class="ring-w">
-          <svg width="70" height="70" viewBox="0 0 160 160"><defs><linearGradient id="gG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f5d27a"/><stop offset="40%" stop-color="#e8b84b"/><stop offset="60%" stop-color="#c8922a"/><stop offset="100%" stop-color="#f5d27a"/></linearGradient><linearGradient id="dG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8f4ff"/><stop offset="50%" stop-color="#8fc8f0"/><stop offset="100%" stop-color="#deeeff"/></linearGradient></defs><ellipse cx="80" cy="112" rx="38" ry="10" fill="none" stroke="url(#gG)" stroke-width="7"/><line x1="42" y1="112" x2="42" y2="72" stroke="url(#gG)" stroke-width="7"/><line x1="118" y1="112" x2="118" y2="72" stroke="url(#gG)" stroke-width="7"/><ellipse cx="80" cy="72" rx="38" ry="10" fill="url(#gG)"/><polygon points="80,30 92,52 80,48 68,52" fill="url(#dG)" stroke="#8fb8d8" stroke-width="1"/><polygon points="80,30 92,52 80,44" fill="rgba(255,255,255,0.65)"/><polygon points="80,48 92,52 80,58 68,52" fill="url(#dG)" stroke="#8fb8d8" stroke-width="1"/></svg>
-        </div>
-        <p class="pc-body sm" style="opacity:0.5;">Casablanca · Maroc</p>
-        <div class="pc-folio" style="margin-top:6px;">IV</div>
-      </div>
-      <div class="pg-nav" style="background:linear-gradient(to top,rgba(232,217,176,1) 60%,rgba(232,217,176,0) 100%);">
-        <button class="nav-btn" id="btn3l">&#8592;</button>
-        <div class="nav-dots" id="d3"></div>
-        <button class="nav-btn" id="btn3r">&#8594;</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Page 5 -->
-  <div class="page" id="pg4">
+  <!-- Page 1 — toujours visible en premier (z-index le plus haut) -->
+  <div class="page" id="pg0" style="z-index:9;">
     <div class="pf">
       <div class="pc" style="justify-content:center;">
-        <div class="pc-chapter">Épilogue</div>
-        <div class="pc-title">Avec Amour</div>
+        <div class="pc-chapter">Chapitre I</div>
+        <svg width="40" height="40" viewBox="0 0 60 60" style="margin:4px 0 8px;"><circle cx="30" cy="30" r="26" stroke="rgba(200,168,75,0.2)" stroke-width="0.6" fill="none"/><path d="M30 4C33 14 42 18 30 30C18 18 27 14 30 4Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/><path d="M56 30C46 33 42 42 30 30C42 18 46 27 56 30Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/><path d="M30 56C27 46 18 42 30 30C42 42 33 46 30 56Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/><path d="M4 30C14 27 18 18 30 30C18 42 14 33 4 30Z" fill="rgba(200,168,75,0.09)" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/><circle cx="30" cy="30" r="3" fill="rgba(200,168,75,0.35)"/></svg>
+        <div class="pc-title" style="font-size:clamp(2.2rem,10vw,3rem);">Youssef<br><span style="font-size:0.55em;color:var(--ink2);">&amp;</span><br>Oumaima</div>
         <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
-        <p class="pc-body" style="margin-top:8px;">Votre présence est le plus beau<br>des cadeaux que vous puissiez<br>nous offrir.</p>
-        <div style="margin:16px 0;font-family:'Great Vibes',cursive;font-size:clamp(1.6rem,7vw,2.2rem);color:var(--ink2);text-align:center;">Youssef &amp; Oumaima</div>
-        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
-        <p class="pc-body sm" style="margin-top:10px;opacity:0.58;">Nous vous attendons avec impatience<br>le 4 Avril 2026.</p>
-        <div class="pc-folio" style="margin-top:10px;">V</div>
+        <p class="pc-body plain sm" style="font-family:'Cinzel',serif;font-size:clamp(0.48rem,2vw,0.6rem);letter-spacing:4px;opacity:0.5;margin-top:2px;">INVITATION AU MARIAGE</p>
+        <p class="pc-body sm" style="margin-top:10px;opacity:0.62;">Nous avons l'honneur de vous convier<br>à célébrer avec nous le plus beau<br>jour de notre vie.</p>
+        <div class="pc-folio" style="margin-top:10px;">I</div>
       </div>
       <div class="pg-nav">
-        <button class="nav-btn" id="btn4l">&#8592;</button>
-        <div class="nav-dots" id="d4"></div>
-        <button class="nav-btn" id="btn4r">&#8594;</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Page 6 — Not The End -->
-  <div class="page" id="pg5">
-    <div class="pf" style="background:var(--paper);">
-      <div class="pc" style="justify-content:center;gap:0;">
-
-        <!-- Plume + Coeur groupés dans un seul conteneur relatif -->
-        <div class="pg6-scene">
-          <!-- Coeur empreinte en bas -->
-          <img src="assets/coeur.png" alt="coeur empreinte" class="pg6-heart">
-          <!-- Plume superposée, pointe vers le haut du coeur -->
-          <img src="assets/plume.png" alt="plume" class="pg6-quill">
-        </div>
-
-        <!-- NOT THE END -->
-        <div style="text-align:center;margin-top:4px;">
-          <div style="font-family:'Cinzel',serif;font-size:clamp(0.38rem,1.6vw,0.48rem);
-                      letter-spacing:6px;color:var(--gold);opacity:0.5;text-transform:uppercase;
-                      margin-bottom:4px;">— mais plutôt —</div>
-          <div style="font-family:'Great Vibes',cursive;
-                      font-size:clamp(2.8rem,13vw,4.2rem);
-                      color:var(--ink);line-height:1;
-                      text-shadow:0 2px 8px rgba(0,0,0,0.08);">Not The End</div>
-          <div style="font-family:'Cinzel',serif;font-size:clamp(0.38rem,1.6vw,0.48rem);
-                      letter-spacing:5px;color:var(--gold);opacity:0.45;text-transform:uppercase;
-                      margin-top:6px;">le début de tout</div>
-        </div>
-
-        <div class="pc-rule" style="margin-top:14px;"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
-
-        <p class="pc-body sm" style="margin-top:8px;opacity:0.55;font-size:clamp(0.72rem,3vw,0.84rem);">
-          Youssef &amp; Oumaima<br>
-          <span style="font-family:'Cinzel',serif;font-size:0.46rem;letter-spacing:3px;opacity:0.7;">4 · 04 · 2026</span>
-        </p>
-
-        <div class="pc-folio" style="margin-top:10px;">VI</div>
-      </div>
-      <div class="pg-nav">
-        <button class="nav-btn" id="btn5l">&#8592;</button>
-        <div class="nav-dots" id="d5"></div>
-        <button class="nav-btn" disabled>&#8594;</button>
+        <button class="nav-btn" id="btn0l">&#8592;</button>
+        <div class="nav-dots" id="d0"></div>
+        <button class="nav-btn" id="btn0r">&#8594;</button>
       </div>
     </div>
   </div>
@@ -741,7 +739,6 @@ function resizeDustCanvas(){
 }
 resizeDustCanvas();
 window.addEventListener('resize', resizeDustCanvas);
-
 function initDust(){
   dustParticles = [];
   const W = DC.width, H = DC.height;
@@ -1012,12 +1009,12 @@ function openBook(evtX, evtY){
       setTimeout(()=>{
         cover.style.display = 'none';
         bookCont.style.display = 'block';
-        pages.forEach(p => p.classList.remove('visible'));
-        pages[cur].classList.add('visible');
+        // toutes les pages sont visibles par z-index, aucune n'est flippée
+        pages.forEach(p => p.classList.remove('flipped'));
+        cur = 0;
         buildDots();
         setTimeout(()=>{
           DC.style.display='none';
-          resizeFlipCanvas();
         }, 60);
       }, 700);
     }
@@ -1027,231 +1024,67 @@ function openBook(evtX, evtY){
 cover.addEventListener('click', e=>openBook(e.clientX, e.clientY));
 
 // ═══════════════════════════════════════
-//  PAGE TURNING
+//  PAGE TURNING — CSS 3D rotateY
 // ═══════════════════════════════════════
 const TOTAL = 6;
 let cur = 0;
-let flipping = false;
+// pages[0] = pg0 (top, z-index:9) … pages[5] = pg5 (bottom, z-index:4)
+const pages = [
+  document.getElementById('pg0'),
+  document.getElementById('pg1'),
+  document.getElementById('pg2'),
+  document.getElementById('pg3'),
+  document.getElementById('pg4'),
+  document.getElementById('pg5'),
+];
 
-const pages = Array.from({length:TOTAL}, (_,i)=>document.getElementById('pg'+i));
-
-const flipCanvas = document.createElement('canvas');
-flipCanvas.style.cssText = 'position:absolute;inset:0;z-index:500;pointer-events:none;';
-document.getElementById('bookContainer').appendChild(flipCanvas);
-const FC = flipCanvas.getContext('2d');
-
-function resizeFlipCanvas(){
-  const stage = document.getElementById('stage');
-  flipCanvas.width  = stage.offsetWidth;
-  flipCanvas.height = stage.offsetHeight;
-}
-window.addEventListener('resize', resizeFlipCanvas);
-
-function flipTo(next, dir){
-  if(flipping || next < 0 || next >= TOTAL || next === cur) return;
-  flipping = true;
-  resizeFlipCanvas();
+function nextPage(e){
+  if(e) e.stopPropagation();
+  if(cur >= TOTAL - 1) return;
   playPageTurnSound();
-
-  const W = flipCanvas.width;
-  const H = flipCanvas.height;
-  const DURATION = 650;
-  const start = performance.now();
-  const from = cur;
-
-  pages[from].classList.remove('visible');
-  pages[next].classList.add('visible');
-  cur = next;
+  pages[cur].classList.add('flipped');
+  cur++;
   refreshDots();
-
-  const hasPb = pages[from].querySelector('.pb') !== null;
-  const fromBg  = hasPb ? '#ede5cc' : '#f7f0e0';
-  const versoBg = '#e8dfc8';
-
-  function ease(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
-
-  function drawPaper(x, y, w, h, color, shadowSide){
-    if(w <= 0) return;
-    FC.save();
-    FC.beginPath(); FC.rect(x, y, w, h); FC.clip();
-    FC.fillStyle = color;
-    FC.fillRect(x, y, w, h);
-    FC.globalAlpha = 0.04;
-    for(let ly = y + 24; ly < y + h; ly += 24){
-      FC.fillStyle = 'rgba(100,80,40,1)';
-      FC.fillRect(x, ly, w, 1);
-    }
-    FC.globalAlpha = 1;
-    const vg = FC.createRadialGradient(x+w/2, y+h/2, h*0.3, x+w/2, y+h/2, Math.max(w,h)*0.9);
-    vg.addColorStop(0, 'rgba(0,0,0,0)');
-    vg.addColorStop(1, 'rgba(0,0,0,0.08)');
-    FC.fillStyle = vg;
-    FC.fillRect(x, y, w, h);
-    const csw = Math.min(w, 100);
-    if(shadowSide === 'right'){
-      const sg = FC.createLinearGradient(x+w, y, x+w-csw, y);
-      sg.addColorStop(0, 'rgba(0,0,0,0.55)');
-      sg.addColorStop(0.4, 'rgba(0,0,0,0.15)');
-      sg.addColorStop(1, 'rgba(0,0,0,0)');
-      FC.fillStyle = sg;
-      FC.fillRect(x+w-csw, y, csw, h);
-    } else {
-      const sg = FC.createLinearGradient(x, y, x+csw, y);
-      sg.addColorStop(0, 'rgba(0,0,0,0.55)');
-      sg.addColorStop(0.4, 'rgba(0,0,0,0.15)');
-      sg.addColorStop(1, 'rgba(0,0,0,0)');
-      FC.fillStyle = sg;
-      FC.fillRect(x, y, csw, h);
-    }
-    FC.restore();
-  }
-
-  function drawLiftShadow(edgeX, dir, alpha){
-    const sw = W * 0.18;
-    let sg;
-    if(dir > 0){
-      sg = FC.createLinearGradient(edgeX, 0, edgeX + sw, 0);
-    } else {
-      sg = FC.createLinearGradient(edgeX, 0, edgeX - sw, 0);
-    }
-    sg.addColorStop(0, `rgba(0,0,0,${alpha * 0.45})`);
-    sg.addColorStop(1, 'rgba(0,0,0,0)');
-    FC.fillStyle = sg;
-    if(dir > 0){
-      FC.fillRect(edgeX, 0, Math.min(sw, W - edgeX), H);
-    } else {
-      FC.fillRect(Math.max(0, edgeX - sw), 0, sw, H);
-    }
-  }
-
-  function animate(now){
-    const rawT = Math.min((now - start) / DURATION, 1);
-    const t = ease(rawT);
-    FC.clearRect(0, 0, W, H);
-
-    const angle = t * Math.PI;
-    const projW  = Math.abs(Math.cos(angle)) * W;
-    const phase1 = rawT < 0.5;
-    const liftAlpha = Math.sin(angle);
-
-    if(dir > 0){
-      const edgeX = projW;
-      if(phase1){
-        drawPaper(0, 0, projW, H, fromBg, 'right');
-        if(projW < W) drawLiftShadow(projW, 1, liftAlpha);
-      } else {
-        drawPaper(0, 0, projW, H, versoBg, 'right');
-      }
-    } else {
-      const x0 = W - projW;
-      if(phase1){
-        drawPaper(x0, 0, projW, H, fromBg, 'left');
-        if(x0 > 0) drawLiftShadow(x0, -1, liftAlpha);
-      } else {
-        drawPaper(x0, 0, projW, H, versoBg, 'left');
-      }
-    }
-
-    if(rawT < 1){
-      requestAnimationFrame(animate);
-    } else {
-      FC.clearRect(0, 0, W, H);
-      flipping = false;
-    }
-  }
-  requestAnimationFrame(animate);
 }
 
-function nextPage(e){ if(e) e.stopPropagation(); flipTo(cur+1, 1); }
-function prevPage(e){ if(e) e.stopPropagation(); flipTo(cur-1,-1); }
+function prevPage(e){
+  if(e) e.stopPropagation();
+  if(cur <= 0) return;
+  playPageTurnSound();
+  cur--;
+  pages[cur].classList.remove('flipped');
+  refreshDots();
+}
 
 function goToCover(e){
   if(e) e.stopPropagation();
-  if(flipping || !bookOpen) return;
-  flipping = true;
-  resizeFlipCanvas();
+  if(!bookOpen) return;
   playPageTurnSound();
-
-  const W = flipCanvas.width;
-  const H = flipCanvas.height;
-  const DURATION = 650;
-  const start = performance.now();
-
-  pages[cur].classList.remove('visible');
+  // unflip all pages
+  pages.forEach(p => p.classList.remove('flipped'));
   cur = 0;
-
-  function ease(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
-
-  function animate(now){
-    const rawT = Math.min((now - start)/DURATION, 1);
-    const t = ease(rawT);
-    FC.clearRect(0,0,W,H);
-
-    const angle = t * Math.PI;
-    const projW  = Math.abs(Math.cos(angle)) * W;
-    const phase1 = rawT < 0.5;
-    const liftA  = Math.sin(angle);
-    const x0 = W - projW;
-
-    if(phase1){
-      if(projW > 0){
-        FC.save();
-        FC.beginPath(); FC.rect(x0,0,projW,H); FC.clip();
-        FC.fillStyle = '#f7f0e0'; FC.fillRect(x0,0,projW,H);
-        const csw = Math.min(projW,100);
-        const sg = FC.createLinearGradient(x0,0,x0+csw,0);
-        sg.addColorStop(0,'rgba(0,0,0,0.5)');
-        sg.addColorStop(1,'rgba(0,0,0,0)');
-        FC.fillStyle = sg; FC.fillRect(x0,0,csw,H);
-        FC.restore();
+  // hide book, show cover
+  setTimeout(()=>{
+    bookCont.style.display='none';
+    cover.style.display='';
+    cover.style.opacity='1';
+    cover.style.transform='';
+    cover.style.pointerEvents='auto';
+    DC.style.display='';
+    dustCleared=false;
+    bookOpen=false;
+    initDust();
+    (function redrawDust(){
+      DX.clearRect(0,0,DC.width,DC.height);
+      for(let p of dustParticles){
+        const a=p.alpha;
+        const color=p.hue>0?`hsla(${p.hue},${p.sat}%,85%,${a})`:`rgba(210,190,155,${a})`;
+        DX.beginPath(); DX.arc(p.x,p.y,p.r,0,Math.PI*2);
+        DX.fillStyle=color; DX.fill();
       }
-      if(x0 > 0){
-        const sw = W*0.18;
-        const sg = FC.createLinearGradient(x0,0,Math.max(x0-sw,0),0);
-        sg.addColorStop(0,`rgba(0,0,0,${liftA*0.4})`);
-        sg.addColorStop(1,'rgba(0,0,0,0)');
-        FC.fillStyle=sg; FC.fillRect(0,0,x0,H);
-      }
-    } else {
-      if(projW > 0){
-        FC.save();
-        FC.beginPath(); FC.rect(x0,0,projW,H); FC.clip();
-        FC.fillStyle = '#1a0e06'; FC.fillRect(x0,0,projW,H);
-        const sg = FC.createLinearGradient(W,0,W-Math.min(projW,80),0);
-        sg.addColorStop(0,`rgba(0,0,0,${liftA*0.6})`);
-        sg.addColorStop(1,'rgba(0,0,0,0)');
-        FC.fillStyle=sg; FC.fillRect(x0,0,projW,H);
-        FC.restore();
-      }
-    }
-
-    if(rawT < 1){
-      requestAnimationFrame(animate);
-    } else {
-      FC.clearRect(0,0,W,H);
-      bookCont.style.display='none';
-      cover.style.display='';
-      cover.style.opacity='1';
-      cover.style.transform='';
-      cover.style.pointerEvents='auto';
-      DC.style.display='';
-      dustCleared=false;
-      bookOpen=false;
-      initDust();
-      (function redrawDust(){
-        DX.clearRect(0,0,DC.width,DC.height);
-        for(let p of dustParticles){
-          const a=p.alpha;
-          const color=p.hue>0?`hsla(${p.hue},${p.sat}%,85%,${a})`:`rgba(210,190,155,${a})`;
-          DX.beginPath(); DX.arc(p.x,p.y,p.r,0,Math.PI*2);
-          DX.fillStyle=color; DX.fill();
-        }
-        drawDustVignette();
-      })();
-      flipping=false;
-    }
-  }
-  requestAnimationFrame(animate);
+      drawDustVignette();
+    })();
+  }, 1000);
 }
 
 // ═══════════════════════════════════════
