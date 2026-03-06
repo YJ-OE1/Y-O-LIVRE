@@ -107,14 +107,14 @@ html,body{
   font-family:'Cinzel',serif;
   font-size:clamp(0.44rem,1.9vw,0.56rem);
   letter-spacing:5px;text-transform:uppercase;
-  color:rgba(200,168,75,0.55);
+  color:rgb(200 168 75);
   margin-bottom:16px;
   text-shadow:0 1px 3px rgba(0,0,0,0.8),0 0 12px rgba(200,168,75,0.15);
 }
 
 .cv-names{
   font-family:'Great Vibes',cursive;
-  font-size:clamp(3.6rem,15vw,5.6rem);
+  font-size:clamp(3.6rem,15vw,5.0rem);
   color:#d4a843;
   line-height:1.05;
   text-shadow:
@@ -142,12 +142,15 @@ html,body{
 
 .cv-date{
   font-family:'Cinzel',serif;
-  font-size:clamp(0.55rem,2.4vw,0.72rem);
+  font-size:clamp(0.55rem,2.4vw,1.0rem);
   letter-spacing:5px;
-  color:rgba(200,168,75,0.72);
+  color:rgb(208 167 57);
   text-transform:uppercase;
   text-shadow:0 1px 4px rgba(0,0,0,0.9),0 0 10px rgba(200,168,75,0.12);
 }
+.cv-cadeau{font-family:'IM Fell English',serif;font-style:italic;font-size:clamp(0.88rem,3.8vw,1.3rem);color:#f0a752;line-height:1.75;text-align:center;margin-top:6px;}
+.cv-cadeau.sm{font-size:clamp(0.78rem,3.3vw,0.92rem);}
+.cv-cadeau.plain{font-style:normal;}
 
 .cv-seal{margin-top:20px;opacity:0.9;}
 
@@ -427,7 +430,7 @@ html,body{
       <path d="M155 9 L160 4 L165 9 L160 14 Z" fill="rgba(200,168,75,0.35)" stroke="rgba(200,168,75,0.5)" stroke-width="0.5"/>
       <line x1="170" y1="9" x2="260" y2="9" stroke="rgba(200,168,75,0.4)" stroke-width="0.6"/>
     </svg>
-
+    <div class="cv-date">Samedi · 4 Avril · 2026</div>
     <div style="display:flex;gap:10px;justify-content:center;align-items:center;margin-bottom:6px;">
       <div style="text-align:center;">
         <span id="cv-cdj" style="font-family:'Cinzel',serif;font-size:clamp(0.9rem,4vw,1.15rem);font-weight:600;color:#d4a843;display:block;text-shadow:0 2px 8px rgba(0,0,0,0.9),0 0 12px rgba(200,168,75,0.3);">--</span>
@@ -466,8 +469,7 @@ html,body{
         <line x1="100" y1="7" x2="140" y2="7" stroke="rgba(200,168,75,0.45)" stroke-width="0.6"/>
       </svg>
     </div>
-
-    <div class="cv-date">Samedi · 4 Avril · 2026</div>
+    <p class="cv-cadeau" style="margin-top:8px;">Votre présence est le plus beau<br>des cadeaux que vous puissiez<br>nous offrir.</p>
 
     <div class="cv-seal">
       <svg width="62" height="62" viewBox="0 0 62 62">
@@ -611,8 +613,8 @@ html,body{
         <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
         <img class="vphoto" src="assets/notreSalle.jpeg" alt="Salle"/>
         <div class="irow"><span class="ico">📍</span>Meknés, Maroc</div>
-        <div class="irow"><span class="ico">🕖</span>Samedi 4 Avril 2026 · 19h00</div>
-        <div class="irow"><span class="ico">✨</span>Soirée de Gala</div>
+        <div class="irow"><span class="ico">🕖</span>Samedi 4 Avril 2026 · 16h00</div>
+        <div class="irow"><span class="ico">✨</span>Fête de mariage</div>
         <a href="https://maps.app.goo.gl/V8ewxEcuPoiRUozn9" target="_blank" class="btn-dir" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;">📍 Voir sur Google Maps →</a>
         <div class="pc-folio" style="margin-top:8px;">III</div>
       </div>
@@ -1161,5 +1163,6 @@ document.addEventListener('touchend',e=>{
 </script>
 </body>
 </html>
+
 
 
