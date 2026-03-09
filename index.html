@@ -732,10 +732,15 @@ html,body{
         <p class="pc-body sm" style="margin-top:10px;opacity:0.58;">Nous vous attendons avec impatience<br>le 4 Avril 2026.</p>
         <div class="pc-folio" style="margin-top:10px;">V</div>
       </div>
-      <div class="pg-nav">
+<!--       <div class="pg-nav">
         <button class="nav-btn" id="btn4l">&#8592;</button>
         <div class="nav-dots" id="d4"></div>
         <button class="nav-btn" id="btn4r">&#8594;</button>
+      </div> -->
+      <div class="pg-nav">
+        <button class="nav-btn" id="btn0l">&#8592;</button>
+        <div class="nav-dots" id="d0"></div>
+        <button class="nav-btn" id="btn0r">&#8594;</button>
       </div>
     </div>
 </div><!-- /bookContainer -->
@@ -1071,8 +1076,8 @@ const pages = [
   document.getElementById('pg1'),
   document.getElementById('pg2'),
   document.getElementById('pg3'),
-  document.getElementById('pg4'),
-  // document.getElementById('pg5'),
+  // document.getElementById('pg4'),
+  document.getElementById('pg5'),
 ];
 
 function nextPage(e){
@@ -1158,7 +1163,7 @@ wire('btn0l', goToCover); wire('btn0r', nextPage);
 wire('btn1l', prevPage);  wire('btn1r', nextPage);
 wire('btn2l', prevPage);  wire('btn2r', nextPage);
 wire('btn3l', prevPage);  wire('btn3r', nextPage);
-wire('btn4l', prevPage);  wire('btn4r', nextPage);
+// wire('btn4l', prevPage);  wire('btn4r', nextPage);
 wire('btn5l', prevPage);
 
 // ═══════════════════════════════════════
