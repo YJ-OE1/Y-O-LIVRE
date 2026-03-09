@@ -552,7 +552,7 @@ html,body{
   </div>
 
   <!-- Page 5 -->
-  <div class="page" id="pg4" style="z-index:5;">
+<!--   <div class="page" id="pg4" style="z-index:5;">
     <div class="pf">
       <div class="pc" style="justify-content:center;">
         <div class="pc-chapter">Épilogue</div>
@@ -570,7 +570,7 @@ html,body{
         <button class="nav-btn" id="btn4r">&#8594;</button>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Page 4 -->
   <div class="page" id="pg3" style="z-index:6;">
@@ -612,7 +612,7 @@ html,body{
         <img class="vphoto" src="assets/notreSalle.jpeg" alt="Salle"/>
         <div class="irow"><span class="ico">📍</span>Meknés, Maroc</div>
         <div class="irow"><span class="ico">🕖</span>Samedi 4 Avril 2026 · 19h00</div>
-        <div class="irow"><span class="ico">✨</span>Soirée de Gala</div>
+        <div class="irow"><span class="ico">✨</span>Fête de mariage</div>
         <a href="https://maps.app.goo.gl/V8ewxEcuPoiRUozn9" target="_blank" class="btn-dir" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;">📍 Voir sur Google Maps →</a>
         <div class="pc-folio" style="margin-top:8px;">III</div>
       </div>
@@ -700,7 +700,7 @@ html,body{
   </div>
 
   <!-- Page 1 — toujours visible en premier (z-index le plus haut) -->
-  <div class="page" id="pg0" style="z-index:9;">
+<!--   <div class="page" id="pg0" style="z-index:9;">
     <div class="pf">
       <div class="pc" style="justify-content:center;">
         <div class="pc-chapter">Chapitre I</div>
@@ -717,8 +717,27 @@ html,body{
         <button class="nav-btn" id="btn0r">&#8594;</button>
       </div>
     </div>
-  </div>
-
+  </div> -->
+    <!-- Page 5 -->
+  <div class="page" id="pg0" style="z-index:9;">
+    <div class="pf">
+      <div class="pc" style="justify-content:center;">
+        <div class="pc-chapter">Épilogue</div>
+        <div class="pc-title">Avec Amour</div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+                <p class="pc-body plain sm" style="font-family:'Cinzel',serif;font-size:clamp(0.48rem,2vw,0.6rem);letter-spacing:4px;opacity:0.5;margin-top:2px;">INVITATION AU MARIAGE</p>
+        <p class="pc-body" style="margin-top:8px;">Votre présence est le plus beau<br>des cadeaux que vous puissiez<br>nous offrir.</p>
+        <div style="margin:16px 0;font-family:'Great Vibes',cursive;font-size:clamp(1.6rem,7vw,2.2rem);color:var(--ink2);text-align:center;">Youssef &amp; Oumaima</div>
+        <div class="pc-rule"><div class="pc-rl"></div><div class="pc-rd">◆</div><div class="pc-rl"></div></div>
+        <p class="pc-body sm" style="margin-top:10px;opacity:0.58;">Nous vous attendons avec impatience<br>le 4 Avril 2026.</p>
+        <div class="pc-folio" style="margin-top:10px;">V</div>
+      </div>
+      <div class="pg-nav">
+        <button class="nav-btn" id="btn4l">&#8592;</button>
+        <div class="nav-dots" id="d4"></div>
+        <button class="nav-btn" id="btn4r">&#8594;</button>
+      </div>
+    </div>
 </div><!-- /bookContainer -->
 </div><!-- /stage -->
 </div><!-- /app -->
@@ -1044,7 +1063,7 @@ cover.addEventListener('click', e=>openBook(e.clientX, e.clientY));
 // ═══════════════════════════════════════
 //  PAGE TURNING — CSS 3D rotateY
 // ═══════════════════════════════════════
-const TOTAL = 6;
+const TOTAL = 5;
 let cur = 0;
 // pages[0] = pg0 (top, z-index:9) … pages[5] = pg5 (bottom, z-index:4)
 const pages = [
@@ -1053,7 +1072,7 @@ const pages = [
   document.getElementById('pg2'),
   document.getElementById('pg3'),
   document.getElementById('pg4'),
-  document.getElementById('pg5'),
+  // document.getElementById('pg5'),
 ];
 
 function nextPage(e){
@@ -1161,4 +1180,5 @@ document.addEventListener('touchend',e=>{
 </script>
 </body>
 </html>
+
 
